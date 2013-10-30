@@ -1,5 +1,6 @@
 import java.net.Socket
 import java.io.OutputStream
+import java.io.InputStream
 
 import scala.util.Random
 
@@ -11,6 +12,50 @@ def CLIENT_HELLO: Byte = 0x01
 
 def SSL_RSA_WITH_RC4_128_MD5 = 0x04
 def NULL_COMPRESS = 0x00
+
+class StreamBasedArray(stream: InputStream) {
+	var internalArray = Array[Byte]()
+
+	/* always return the next len bytes. abort if not enough bytes in the stream */
+	def nextBytes(len: Int): Array[Byte] = {
+		if (internalArray.length >= len) {
+			val ret = internalArray.dropRight(internalArray.length - len)
+			internalArray = internalArray.drop(len)
+			ret
+		} else {
+			readMore(len - internalArray.length)
+			nextBytes(len)
+		}
+	}
+
+	def readMore(len: Int) {
+		val buf = new Array[Byte](len)
+		val n = stream.read(buf)
+		if (n == -1)
+			sys.error("EOF too early")
+		internalArray = internalArray ++ buf.dropRight(len - n)
+		if (n < len)
+			readMore(len - n)
+	}
+}
+
+def dumpByteArray(bin: Array[Byte]) {
+	def width = 16
+	def dumpLine(subbin: Array[Byte]) {
+		if (subbin.length == 0) 
+			println("")
+		else {
+			printf(" %02x", subbin(0))
+			dumpLine(subbin.drop(1))
+		}
+	}
+	if (bin.length <= width) {
+		dumpLine(bin)
+	} else {
+		dumpLine(bin.dropRight(bin.length - width)) 
+		dumpByteArray(bin.drop(width))
+	}
+}
 
 def intToByteArray(value: Int, len: Int): Array[Byte] = {
 	if (len == 0) {
@@ -35,6 +80,10 @@ def sendMessage(host: String, port: Int, msg: Array[Byte]) {
 	val sock = new Socket(host, port)
 	val os = sock.getOutputStream
 	os.write(msg)
+
+	val sbArray = new StreamBasedArray(sock.getInputStream)
+	dumpByteArray(sbArray.nextBytes(64))
+
 	spin
 }
 
@@ -61,9 +110,12 @@ def genClientHello(): Array[Byte] = {
 	Array[Byte](CLIENT_HELLO) ++ intToByteArray(payload.length, 3) ++ payload
 }
 
-val msg = toHandshake(genClientHello())
-val host = "127.0.0.1"
-// val port = 1234
-val port = 8443
-sendMessage(host, port, msg)
+def run {
+	val msg = toHandshake(genClientHello())
+	val host = "127.0.0.1"
+	// val port = 1234
+	val port = 8443
+	sendMessage(host, port, msg)
+}
 
+run
