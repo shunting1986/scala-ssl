@@ -10,6 +10,17 @@ object Util {
 			Thread.sleep(1000)
 		}
 	}
+
+	/*
+	 * Assume big endian
+	 */
+	def byteArrayToInt(buf: Array[Byte]): Int = {
+		var res = 0
+		for (b <- buf) {
+			res = (res * 256) + (b.intValue & 0xff)
+		}
+		res
+	}
 	
 	/* convert an integer to a byte array of the specified length */
 	def intToByteArray(value: Int, len: Int): Array[Byte] = {

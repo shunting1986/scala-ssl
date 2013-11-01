@@ -2,6 +2,7 @@ package ssl
 
 import java.net.Socket
 import util.StreamBasedArray
+import util.Util._
 
 /* This class manage all the low level socket read/write */
 class SSLConnection(host: String, port: Int) {
@@ -22,5 +23,11 @@ class SSLConnection(host: String, port: Int) {
 		val ch = new ClientHello
 		val msg = ch.toHandshake(ch.genClientHello)
 		send(msg)
+	}
+
+	def recvServerHello(): ServerHello = {
+		val sh = new ServerHello
+		sh.recvServerHello(this)
+		sh
 	}
 }

@@ -3,7 +3,6 @@ package ssl
 import util.Util._
 
 class ClientHello extends Handshake {
-	def CLIENT_HELLO: Byte = 0x01
 	def SSL_RSA_WITH_RC4_128_MD5 = 0x04
 	def NULL_COMPRESS = 0x00
 

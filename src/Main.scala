@@ -9,7 +9,8 @@ object Main {
 		val conn = new SSLConnection(host, port)
 
 		conn.sendClientHello
-		dumpByteArray(conn.recv(64))
+
+		val sh = conn.recvServerHello
 		spin
 	}
 }
