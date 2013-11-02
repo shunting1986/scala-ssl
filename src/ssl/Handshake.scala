@@ -8,6 +8,7 @@ class Handshake {
 
 	def CLIENT_HELLO: Byte = 0x01
 	def SERVER_HELLO: Byte = 0x02
+	def CERTIFICATE_HS: Byte = 11
 
 	def MAJVER: Byte = 0x03
 	def MINVER: Byte = 0x00
@@ -41,9 +42,26 @@ class Handshake {
 		assert(!reader.hasMore)
 	}
 
+	def decodeCertificateHS(data: Array[Byte]) {
+		val reader = new ArrayBasedReader(data)
+		val totLen = reader.nextInt(3)
+
+		assert(totLen == reader.leftLength)
+
+		while (reader.hasMore) {
+			val certLen = reader.nextInt(3)
+			val certData = reader.nextBytes(certLen)
+
+			printf("Cert:\n")
+			dumpByteArray(certData)
+		}
+	}
+
 	def decodeHandshake(typ: Int, data: Array[Byte]) {
 		if (typ == SERVER_HELLO) {
 			decodeServerHello(data)
+		} else if (typ == CERTIFICATE_HS) {
+			decodeCertificateHS(data)
 		} else {
 			printf("Type = %d\n", typ)
 			sys.error("Unsupported type")

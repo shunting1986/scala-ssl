@@ -20,5 +20,7 @@ class ArrayBasedReader(_data: Array[Byte]) {
 		subdata
 	}
 
+	def leftLength = data.length
+
 	def getData(): Array[Byte] = data
 }
