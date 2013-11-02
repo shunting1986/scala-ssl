@@ -9,6 +9,19 @@ class ArrayBasedReader(_data: Array[Byte]) {
 		data.length > 0
 	}
 
+	def peekInt(len: Int): Int = {
+		byteArrayToInt(peekBytes(len))
+	}
+
+	def peekBytes(len: Int): Array[Byte] = {
+		assert(data.length >= len)
+		data.dropRight(data.length - len)
+	}
+	
+	def skip(len: Int) {
+		data = data.drop(len)
+	}
+
 	def nextInt(len: Int): Int = {
 		byteArrayToInt(nextBytes(len))
 	}
