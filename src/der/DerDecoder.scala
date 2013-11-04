@@ -1,6 +1,7 @@
 package der
 
 import util.ArrayBasedReader
+import util.Util._
 
 class DerDecoder {
 	def decodeLength(reader: ArrayBasedReader): Int = {
@@ -55,6 +56,28 @@ class DerDecoder {
 		printf("[PrintableString]: %s\n", new String(data))
 	}
 
+	def decodeUTCTime(reader: ArrayBasedReader) {
+		val len = decodeLength(reader)
+		val data = reader.nextBytes(len);
+		printf("[UTCTime]: %s\n", new String(data))
+	}
+
+	def decodeBitString(reader: ArrayBasedReader) {
+		val len = decodeLength(reader);
+		assert(len > 0)
+		val unused = reader.nextInt(1)
+		val data = reader.nextBytes(len - 1)
+		printf("[BitString] unused %d, data:\n", unused)
+		dumpByteArray(data)
+	}
+
+	def decodeOctetString(reader: ArrayBasedReader) {
+		val len = decodeLength(reader);
+		val data = reader.nextBytes(len)
+		printf("[OCTET STRING]: ")
+		dumpByteArray(data)
+	}
+
 	def decodeObjectIdentifier(reader: ArrayBasedReader) {
 		val len = decodeLength(reader)
 		val data = reader.nextBytes(len)
@@ -101,6 +124,12 @@ class DerDecoder {
 			decodeNull(reader)
 		} else if (typeByte == 0x13) { // printable string
 			decodePrintableString(reader)
+		} else if (typeByte == 0x17) { // UTCTime
+			decodeUTCTime(reader)
+		} else if (typeByte == 0x03) { // BIT String
+			decodeBitString(reader)
+		} else if (typeByte == 0x04) { // OCTET String
+			decodeOctetString(reader)
 		} else {
 			printf("type is 0x%02x\n", typeByte)
 			sys.error("unsupported ASN.1 type")

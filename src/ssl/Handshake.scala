@@ -54,7 +54,7 @@ class Handshake {
 			val certData = reader.nextBytes(certLen)
 
 			printf("Cert:\n")
-			dumpByteArray(certData)
+			// dumpByteArray(certData)
 
 			val derDecoder = new DerDecoder
 			derDecoder.decode(certData)
