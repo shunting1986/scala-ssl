@@ -46,6 +46,7 @@ class Handshake {
 
 	def decodeServerHelloDone(data: Array[Byte]) {
 		assert(data.length == 0)
+		printf("Get Server Hello Done\n")
 	}
 
 	def decodeCertificateHS(data: Array[Byte]) {

@@ -6,4 +6,4 @@ compile:
 	find src -name *.scala | xargs $(SCALAC) -d classes
 
 run:
-	$(SCALA) -classpath classes Main
+	$(SCALA) -classpath classes crypto.MD5

@@ -1,6 +1,7 @@
 package util
 
 import scala.util.Random
+import java.io.InputStream
 
 object Util {
 	/* printing '.' every one second in a forever loop */
@@ -55,5 +56,21 @@ object Util {
 			dumpLine(bin.dropRight(bin.length - width)) 
 			dumpByteArray(bin.drop(width))
 		}
+	}
+
+	/* Convert stream to byte array */
+	def streamToByteArray(in: InputStream): Array[Byte] = {
+		var res = new Array[Byte](0)
+		var buf = new Array[Byte](256)
+
+		def readMore() {
+			val r = in.read(buf)
+			if (r >= 0) {
+				res = res ++ buf.slice(0, r)
+				readMore
+			} 
+		}
+		readMore
+		res
 	}
 }
