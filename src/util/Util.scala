@@ -58,6 +58,39 @@ object Util {
 		}
 	}
 
+	/* Hex dump to byte array */
+	def hexToBin(hex: Array[Byte]): Array[Byte] = {
+		var bin = Array[Byte]()
+
+		var i = 0
+		var u = -1
+		while (i < hex.length) {
+			var item = hex(i)
+			var v = -1
+			if (item >= '0' && item <= '9') {
+				v = item - '0'
+			} else if (item >= 'a' && item <= 'f') {
+				v = item - 'a' + 10
+			} else if (item >= 'A' && item <= 'F') {
+				v = item - 'A' + 10
+			}
+
+			if (v != -1) {
+				if (u == -1) {
+					u = v
+				} else {
+					val bt = u * 16 + v
+					u = -1
+					bin = bin :+ bt.asInstanceOf[Byte]
+				}
+			}
+
+			i += 1
+		}
+		assert(u == -1)
+		bin
+	}
+
 	/* Convert stream to byte array */
 	def streamToByteArray(in: InputStream): Array[Byte] = {
 		var res = new Array[Byte](0)
@@ -72,5 +105,11 @@ object Util {
 		}
 		readMore
 		res
+	}
+
+	def main(args: Array[String]) {
+		val input = streamToByteArray(System.in)
+		val output = hexToBin(input)
+		System.out.write(output)
 	}
 }

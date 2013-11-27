@@ -6,4 +6,4 @@ compile:
 	find src -name *.scala | xargs $(SCALAC) -d classes
 
 run:
-	$(SCALA) -classpath classes crypto.SHA1
+	@$(SCALA) -classpath classes util.Util
