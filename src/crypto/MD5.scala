@@ -6,12 +6,6 @@ import util.Util
 
 object MD5 {
 	def main(args: Array[String]) {
-		/*
-		val md5 = new MD5
-		val input = Array[Byte](0x61, 0x62, 0x63, 0x0a)
-		val output = md5.doHash(input)
-		Util.dumpByteArray(output)
-		 */
 		val md5 = new MD5
 		var buf = Util.streamToByteArray(System.in)
 		val output = md5.doHash(buf)
