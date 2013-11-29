@@ -107,6 +107,17 @@ object Util {
 		res
 	}
 
+	def byteArrayToBigInt(ar: Array[Byte]): BigInt = {
+		var bi = BigInt(0)
+		var i = 0
+		while (i < ar.length) {
+			val bt = ar(i)
+			bi = bi * 256 + (bt.asInstanceOf[Int] & 255)
+			i += 1
+		}
+		bi
+	}
+
 	def main(args: Array[String]) {
 		val input = streamToByteArray(System.in)
 		val output = hexToBin(input)
