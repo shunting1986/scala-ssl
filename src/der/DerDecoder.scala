@@ -3,7 +3,9 @@ package der
 import util.ArrayBasedReader
 import util.Util._
 
+/* All the code in this class should be migrated to DerNode hierarchy */
 class DerDecoder {
+	// DEPRECATED
 	def decodeLength(reader: ArrayBasedReader): Int = {
 		var first = reader.nextInt(1)
 		if ((first & 0x80) != 0) {
@@ -15,7 +17,7 @@ class DerDecoder {
 	}
 
 	// NOTE: the same as sequence?
-	def decodeSet(reader: ArrayBasedReader) {
+	def decodeSet(reader: ArrayBasedReader): DerNode = {
 		printf("[SET]\n")
 		val len = decodeLength(reader)
 
@@ -23,62 +25,57 @@ class DerDecoder {
 		while (subreader.hasMore) {
 			decode(subreader)
 		}
+		assert(false); null
 	}
 
-	def decodeSequence(reader: ArrayBasedReader) {
-		printf("[SEQUENCE]\n")
-		val len = decodeLength(reader)
-		
-		val subreader = new ArrayBasedReader(reader.nextBytes(len))
-		while (subreader.hasMore) {
-			val optid = subreader.peekInt(1)
-			if ((optid & 0xe0) == 0xa0) {
-				printf("[SEQID %04x]\n", subreader.nextInt(2))
-			}
-			decode(subreader)
-		}
+	def decodeSequence(reader: ArrayBasedReader): DerNode = {
+		(new SequenceNode).decode(reader)
 	}
 
-	def decodeInteger(reader: ArrayBasedReader) {
-		val len = decodeLength(reader)
-		printf("[Integer] %d\n", reader.nextInt(len))
+	def decodeInteger(reader: ArrayBasedReader): DerNode = {
+		(new IntegerNode).decode(reader)
 	}
 
-	def decodeNull(reader: ArrayBasedReader) {
+	def decodeNull(reader: ArrayBasedReader): DerNode = {
 		val len = decodeLength(reader)
 		assert(len == 0)
 		printf("[NULL]\n")
+		assert(false); null
 	}
 
-	def decodePrintableString(reader: ArrayBasedReader) {
+	def decodePrintableString(reader: ArrayBasedReader): DerNode = {
 		val len = decodeLength(reader)
 		val data = reader.nextBytes(len)
 		printf("[PrintableString]: %s\n", new String(data))
+		assert(false); null
 	}
 
-	def decodeUTCTime(reader: ArrayBasedReader) {
+	def decodeUTCTime(reader: ArrayBasedReader): DerNode = {
 		val len = decodeLength(reader)
 		val data = reader.nextBytes(len);
 		printf("[UTCTime]: %s\n", new String(data))
+		assert(false); null
 	}
 
-	def decodeBitString(reader: ArrayBasedReader) {
+	def decodeBitString(reader: ArrayBasedReader): DerNode = {
 		val len = decodeLength(reader);
 		assert(len > 0)
 		val unused = reader.nextInt(1)
 		val data = reader.nextBytes(len - 1)
 		printf("[BitString] unused %d, data:\n", unused)
 		dumpByteArray(data)
+		assert(false); null
 	}
 
-	def decodeOctetString(reader: ArrayBasedReader) {
+	def decodeOctetString(reader: ArrayBasedReader): DerNode = {
 		val len = decodeLength(reader);
 		val data = reader.nextBytes(len)
 		printf("[OCTET STRING]: ")
 		dumpByteArray(data)
+		assert(false); null
 	}
 
-	def decodeObjectIdentifier(reader: ArrayBasedReader) {
+	def decodeObjectIdentifier(reader: ArrayBasedReader): DerNode = {
 		val len = decodeLength(reader)
 		val data = reader.nextBytes(len)
 
@@ -101,15 +98,17 @@ class DerDecoder {
 			printf(".%d", v)
 		}
 		printf("\n")
+		assert(false); null
 	}
 
-	def decode(bin: Array[Byte]) {
+	def decode(bin: Array[Byte]): DerNode = {
 		val reader = new ArrayBasedReader(bin)
-		decode(reader)
+		val node = decode(reader)
 		assert(!reader.hasMore)
+		node
 	}
 
-	def decode(reader: ArrayBasedReader) {
+	def decode(reader: ArrayBasedReader): DerNode = {
 		val typeByte = reader.nextInt(1)
 
 		if (typeByte == 0x30) { // sequence 

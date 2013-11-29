@@ -3,6 +3,7 @@ package cert
 import scala.io._
 import util.Util._
 import util.Base64
+import der.DerDecoder
 
 object PrivateKey {
 	def main(args: Array[String]) {
@@ -29,6 +30,7 @@ class PrivateKey {
 
 		val body = pemstr.substring(ind_prefix + prefix_mark.length, ind_postfix)
 		val der = Base64.decode(body)
-		dumpByteArray(der)
+		val derDecoder = new DerDecoder
+		derDecoder.decode(der).dump(0)
 	}
 }

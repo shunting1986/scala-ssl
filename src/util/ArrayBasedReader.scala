@@ -26,6 +26,10 @@ class ArrayBasedReader(_data: Array[Byte]) {
 		byteArrayToInt(nextBytes(len))
 	}
 
+	def nextBigInt(len: Int): BigInt = {
+		byteArrayToBigInt(nextBytes(len))
+	}
+
 	def nextBytes(len: Int): Array[Byte] = {
 		assert(data.length >= len)
 		val subdata = data.dropRight(data.length - len)
