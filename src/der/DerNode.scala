@@ -3,6 +3,13 @@ package der
 import util.ArrayBasedReader
 
 object DerNode {
+	def decode(bin: Array[Byte]): DerNode = {
+		val reader = new ArrayBasedReader(bin)
+		val node = decode(reader)
+		assert(!reader.hasMore)
+		node
+	}
+	
 	def decode(reader: ArrayBasedReader): DerNode = {
 		val typeByte = reader.nextInt(1)
 

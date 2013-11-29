@@ -3,7 +3,9 @@ package der
 import util.ArrayBasedReader
 
 class SequenceNode extends DerNode {
-	var nodeList = List[DerNode]()
+	var nodeList = Vector[DerNode]()
+
+	def length = nodeList.length
 	
 	override def decode(reader: ArrayBasedReader): DerNode = {
 		val len = decodeLength(reader)
