@@ -107,6 +107,7 @@ object Util {
 		res
 	}
 
+	// big endian
 	def byteArrayToBigInt(ar: Array[Byte]): BigInt = {
 		var bi = BigInt(0)
 		var i = 0
@@ -116,6 +117,23 @@ object Util {
 			i += 1
 		}
 		bi
+	}
+
+	// big endian
+	def bigIntToByteArray(_bi: BigInt, nbyte: Int): Array[Byte] = {
+		var bi = _bi
+		var ar = new Array[Byte](nbyte)
+		var i = nbyte - 1
+		while (i >= 0) {
+			val bt = (bi % 256).byteValue
+			bi /= 256
+
+			ar(i) = bt
+
+			// update indicator variable
+			i -= 1
+		}
+		ar
 	}
 
 	def main(args: Array[String]) {

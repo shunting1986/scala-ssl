@@ -13,7 +13,7 @@ object PrivateKey {
 
 		val fcont = Source.fromFile(keyPath).getLines.mkString("\n")
 		val rkey = new PrivateKey
-		rkey.parsePem(fcont)
+		rkey.parsePemStr(fcont)
 	}
 }
 
@@ -56,7 +56,12 @@ class PrivateKey {
 		assert(seq.length == 9)
 	}
 
-	def parsePem(pemstr: String) {
+	def parsePemFile(keyPath: String) {
+		val fcont = Source.fromFile(keyPath).getLines.mkString("\n")
+		parsePemStr(fcont)
+	}
+
+	def parsePemStr(pemstr: String) {
 		val ind_prefix = pemstr.indexOf(prefix_mark)
 		val ind_postfix = pemstr.indexOf(postfix_mark)
 	
