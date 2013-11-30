@@ -5,6 +5,12 @@ import cert._
 
 object RSA {
 	def main(args: Array[String]) {
+		// Do encryption first
+		val cert = new X509Certificate
+		cert.parsePemFile("/tmp/server.crt")
+		// TODO
+
+		/*
 		// steam to byte array
 		val input = streamToByteArray(System.in)
 
@@ -19,6 +25,7 @@ object RSA {
 		val res = rsa.transformToByteArray(bi, privateKey.privateExponent, privateKey.modulus)
 
 		dumpByteArray(res)
+		 */
 	}
 }
 

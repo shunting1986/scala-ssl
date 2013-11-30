@@ -42,4 +42,27 @@ class ObjectIdentifierNode extends DerNode {
 		}
 		printf("\n")
 	}
+
+	def equals(str: String): Boolean = {
+		val compList = str.split("\\.")
+		if (idList.length != compList.length) {
+			false
+		} else {
+			def equalsComp(i: Int): Boolean = {
+				if (i == idList.length) 
+					true
+				else {
+					val expVal = idList(i)
+					val actStr = compList(i)
+					val actVal = Integer.parseInt(actStr)
+
+					if (expVal != actVal) 
+						false
+					else 
+						equalsComp(i + 1)
+				}
+			}
+			equalsComp(0)
+		}
+	}
 }

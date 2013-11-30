@@ -7,6 +7,10 @@ class SequenceNode extends DerNode {
 	var seqIdList = Vector[Int]()
 
 	def length = nodeList.length
+
+	def getChild(index: Int): DerNode = {
+		nodeList(index)
+	}
 	
 	override def decode(reader: ArrayBasedReader): DerNode = {
 		val len = decodeLength(reader)
