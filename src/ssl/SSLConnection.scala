@@ -59,4 +59,10 @@ class SSLConnection(host: String, port: Int) {
 		val hkMsg = hkAgt.toHandshake(toClientKeyExchange(epms))
 		send(hkMsg)
 	}
+
+	def sendClientChangeCipherSpec {
+		// sample 14 03 00 00 01 01 
+		val record = SSLRecord.createChangeCipherSpec(Array[Byte](1))
+		send(record.serialize)
+	}
 }
