@@ -17,6 +17,20 @@ object DerNode {
 			(new SequenceNode).decode(reader)
 		} else if (typeByte == 0x02) { // integer
 			(new IntegerNode).decode(reader)
+		} else if (typeByte == 0x06) { // object identifier
+			(new ObjectIdentifierNode).decode(reader)
+		} else if (typeByte == 0x05) { // null
+			(new NullNode).decode(reader)
+		} else if (typeByte == 0x31) { // set
+			(new SetNode).decode(reader)
+		} else if (typeByte == 0x13) { // printable string
+			(new PrintableStringNode).decode(reader)
+		} else if (typeByte == 0x17) { // UTCTime
+			(new UTCTimeNode).decode(reader)
+		} else if (typeByte == 0x03) { // BIT String
+			(new BitStringNode).decode(reader)
+		} else if (typeByte == 0x04) { // OCTET String
+			(new OctetStringNode).decode(reader)
 		} else {
 			printf("type is 0x%02x\n", typeByte)
 			sys.error("unsupported ASN.1 type")

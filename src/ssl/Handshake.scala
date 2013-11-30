@@ -2,7 +2,7 @@ package ssl
 
 import util.Util._
 import util.ArrayBasedReader
-import der.DerDecoder
+import der.DerNode
 
 class Handshake {
 	def HANDSHAKE: Byte = 0x16
@@ -62,8 +62,8 @@ class Handshake {
 			printf("Cert:\n")
 			// dumpByteArray(certData)
 
-			val derDecoder = new DerDecoder
-			derDecoder.decode(certData)
+			val derNode = DerNode.decode(certData)
+			derNode.dump(0)
 		}
 	}
 
