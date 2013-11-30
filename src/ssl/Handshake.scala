@@ -3,8 +3,9 @@ package ssl
 import util.Util._
 import util.ArrayBasedReader
 import der.DerNode
+import cert._
 
-class Handshake {
+class Handshake(conn: SSLConnection) {
 	def HANDSHAKE: Byte = 0x16
 
 	def CLIENT_HELLO: Byte = 0x01
@@ -58,13 +59,15 @@ class Handshake {
 		while (reader.hasMore) {
 			val certLen = reader.nextInt(3)
 			val certData = reader.nextBytes(certLen)
-
-			printf("Cert:\n")
-			// dumpByteArray(certData)
-
-			val derNode = DerNode.decode(certData)
-			derNode.dump(0)
+			
+			if (conn.serverCert == null) {
+				conn.serverCert = new X509Certificate
+				conn.serverCert.parseDer(certData)
+			} else {
+				sys.error("Can not handle multipe certificates from server right now")
+			}
 		}
+		assert(conn.serverCert != null)
 	}
 
 	def decodeHandshake(typ: Int, data: Array[Byte]) {

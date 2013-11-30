@@ -11,6 +11,7 @@ object Main {
 		conn.sendClientHello
 
 		val sh = conn.recvServerHello
+		conn.sendClientKeyExchange
 		spin
 	}
 }

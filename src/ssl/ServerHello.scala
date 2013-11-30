@@ -2,7 +2,7 @@ package ssl
 
 import util.Util._
 
-class ServerHello extends Handshake {
+class ServerHello(conn: SSLConnection) extends Handshake(conn) {
 	def validateHeader(header: Array[Byte]):Int = {
 		val ct = header(0)
 		val vermaj = header(1)
