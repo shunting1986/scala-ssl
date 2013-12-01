@@ -9,13 +9,16 @@ import cert._
 
 /* This class manage all the low level socket read/write */
 class SSLConnection(host: String, port: Int) {
-	val sock = new Socket(host, port)
-	val os = sock.getOutputStream
-	val is = sock.getInputStream
+	val sock = if (host == null) null else new Socket(host, port)
+	val os = if (sock == null) null else sock.getOutputStream
+	val is = if (sock == null) null else sock.getInputStream
 	val sbArray = new StreamBasedArray(is)
 
 	var serverCert: X509Certificate = null
 	def publicKey: PublicKey = serverCert.publicKey
+
+	var sendSeq = 0
+	var recvSeq = 0
 
 	def send(msg: Array[Byte]) {
 		os.write(msg)

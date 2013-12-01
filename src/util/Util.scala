@@ -147,6 +147,16 @@ object Util {
 		streamToByteArray(is)
 	}
 
+	def genPadding(len: Int, ct: Byte): Array[Byte] = {
+		var i = 0 
+		val ar = new Array[Byte](len)
+		while (i < len) {
+			ar(i) = ct
+			i += 1
+		}
+		ar
+	}
+
 	def main(args: Array[String]) {
 		val input = streamToByteArray(System.in)
 		val output = hexToBin(input)
