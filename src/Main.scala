@@ -14,6 +14,7 @@ object Main {
 		conn.sendClientKeyExchange
 
 		conn.sendClientChangeCipherSpec
+		conn.sendClientFinishedHandshake
 		spin
 	}
 }

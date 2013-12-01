@@ -65,4 +65,8 @@ class SSLConnection(host: String, port: Int) {
 		val record = SSLRecord.createChangeCipherSpec(Array[Byte](1))
 		send(record.serialize)
 	}
+
+	def sendClientFinishedHandshake {
+		sys.error("ni")
+	}
 }
