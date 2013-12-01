@@ -2,6 +2,8 @@ package util
 
 import scala.util.Random
 import java.io.InputStream
+import scala.io._
+import java.io._
 
 object Util {
 	/* printing '.' every one second in a forever loop */
@@ -134,6 +136,15 @@ object Util {
 			i -= 1
 		}
 		ar
+	}
+
+	def readFile(path: String): String = {
+		Source.fromFile(path).getLines.mkString("\n")
+	}
+
+	def fileToByteArray(path: String): Array[Byte] = {
+		val is = new FileInputStream(new File(path))
+		streamToByteArray(is)
 	}
 
 	def main(args: Array[String]) {
