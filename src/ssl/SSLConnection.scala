@@ -29,8 +29,8 @@ class SSLConnection(host: String, port: Int) {
 	var recvSeq = 0
 
 	// client/server random
-	var clientRandom = Array[Byte]()
-	var serverRandom = Array[Byte]()
+	var clientRandom: Array[Byte] = null
+	var serverRandom: Array[Byte] = null
 
 	def send(msg: Array[Byte]) {
 		os.write(msg)
@@ -53,22 +53,12 @@ class SSLConnection(host: String, port: Int) {
 	 * Client send the 'ClientKeyExchange' handshake to server
 	 */
 	def sendClientKeyExchange() = {
-		// generate PreMasterSecret
-		val pms = Util.genRandom(48)
+		send(SSLRecord.createHandshake((new ClientKeyExchange(this)).serialize).serialize)
 
-		// using server's public key to encode the PreMasterSecret
-		assert(publicKey != null)
-
-		val rsa = new RSA
-		val epms = rsa.encrypt(pms, publicKey)
-
-		// send the encrypted PreMasterSecret
-		def toClientKeyExchange(msg: Array[Byte]): Array[Byte] = {
-			Array[Byte](0x10) ++ Util.intToByteArray(msg.length, 3) ++ msg
-		}
-
-		val hkMsg = SSLRecord.createHandshake(toClientKeyExchange(epms)).serialize
-		send(hkMsg)
+		printf("Client MAC Key: "); dumpByteArray(clientMACKey)
+		printf("Server MAC Key: "); dumpByteArray(serverMACKey)
+		printf("Client Write Key: "); dumpByteArray(clientWriteKey)
+		printf("Server Write Key: "); dumpByteArray(serverWriteKey)
 	}
 
 	def sendClientChangeCipherSpec {
