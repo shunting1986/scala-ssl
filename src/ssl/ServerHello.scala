@@ -1,39 +1,33 @@
 package ssl
 
 import util.Util._
+import ssl.SSLConstants._
+import util._
 
-class ServerHello(conn: SSLConnection) extends Handshake(conn) {
-	def validateHeader(header: Array[Byte]):Int = {
-		val ct = header(0)
-		val vermaj = header(1)
-		val vermin = header(2)
-		val len = byteArrayToInt(header.drop(3))	
+class ServerHello(conn: SSLConnection) {
+	def decode(data: Array[Byte]) {
+		val reader = new ArrayBasedReader(data)
+		val maj = reader.nextInt(1)
+		val min = reader.nextInt(1)
+		assert(maj == MAJVER)
+		assert(min == MINVER)
 
-		assert(ct == HANDSHAKE)
-		assert(vermaj == MAJVER)
-		assert(vermin == MINVER)
+		val serverRandom = reader.nextBytes(32)
+		conn.serverRandom = serverRandom
+		println("Server Random:")
+		dumpByteArray(serverRandom)
 
-		len
-	}
+		val sessionIDLen = reader.nextInt(1)
+		val sessionID = reader.nextBytes(sessionIDLen)
+		println("Session ID:")
+		dumpByteArray(sessionID)
 
-	def recvServerHello(conn: SSLConnection) {
-		val header = conn.recv(5)
-		val len = validateHeader(header)
-		var data = conn.recv(len)
+		val cipherSuite = reader.nextInt(2)
+		printf("CipherSuite %d\n", cipherSuite)
 
-		while (data.length > 0) {
-			assert(data.length >= 4)
-			val typ = byteArrayToInt(data.dropRight(data.length - 1))
-			data = data.drop(1)
+		val compressMethod = reader.nextInt(1)
+		printf("CompressMethod %d\n", compressMethod)
 
-			val sublen = byteArrayToInt(data.dropRight(data.length - 3))
-			data = data.drop(3)
-			assert(sublen <= data.length)
-
-			val subdata = data.dropRight(data.length - sublen)
-			data = data.drop(sublen)
-
-			decodeHandshake(typ, subdata)
-		}
+		assert(!reader.hasMore)
 	}
 }

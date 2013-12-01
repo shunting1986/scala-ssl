@@ -9,35 +9,44 @@ import cert._
 
 /* This class manage all the low level socket read/write */
 class SSLConnection(host: String, port: Int) {
+	// IO
 	val sock = if (host == null) null else new Socket(host, port)
 	val os = if (sock == null) null else sock.getOutputStream
 	val is = if (sock == null) null else sock.getInputStream
-	val sbArray = new StreamBasedArray(is)
 
+	// PKI
 	var serverCert: X509Certificate = null
 	def publicKey: PublicKey = serverCert.publicKey
 
+	// symmetric keys
+	var clientMACKey = Array[Byte]()
+	var serverMACKey = Array[Byte]()
+	var clientWriteKey = Array[Byte]()
+	var serverWriteKey = Array[Byte]()
+
+	// sequence number
 	var sendSeq = 0
 	var recvSeq = 0
+
+	// client/server random
+	var clientRandom = Array[Byte]()
+	var serverRandom = Array[Byte]()
 
 	def send(msg: Array[Byte]) {
 		os.write(msg)
 	}
 
+	val sbArray = new StreamBasedArray(is)
 	def recv(len: Int): Array[Byte] = {
 		sbArray.nextBytes(len)
 	}
 
 	def sendClientHello() {
-		val ch = new ClientHello(this)
-		val msg = ch.toHandshake(ch.genClientHello)
-		send(msg)
+		send((new ClientHello(this)).serialize)
 	}
 
-	def recvServerHello(): ServerHello = {
-		val sh = new ServerHello(this)
-		sh.recvServerHello(this)
-		sh
+	def recvServerHandshake() = {
+		(new ServerHandshake(this)).recvServerHandshake
 	}
 
 	/*
@@ -58,8 +67,7 @@ class SSLConnection(host: String, port: Int) {
 			Array[Byte](0x10) ++ Util.intToByteArray(msg.length, 3) ++ msg
 		}
 
-		val hkAgt = new Handshake(this)
-		val hkMsg = hkAgt.toHandshake(toClientKeyExchange(epms))
+		val hkMsg = SSLRecord.createHandshake(toClientKeyExchange(epms)).serialize
 		send(hkMsg)
 	}
 

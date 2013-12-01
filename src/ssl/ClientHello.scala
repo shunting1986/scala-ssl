@@ -1,11 +1,9 @@
 package ssl
 
 import util.Util._
+import ssl.SSLConstants._
 
-class ClientHello(conn: SSLConnection) extends Handshake(conn) {
-	def SSL_RSA_WITH_RC4_128_MD5 = 0x04
-	def NULL_COMPRESS = 0x00
-
+class ClientHello(conn: SSLConnection) {
 	def cipherSuiteList: Array[Byte] = {
 		val cs = intToByteArray(SSL_RSA_WITH_RC4_128_MD5, 2)
 		intToByteArray(cs.length, 2) ++ cs
@@ -16,16 +14,17 @@ class ClientHello(conn: SSLConnection) extends Handshake(conn) {
 		intToByteArray(cm.length, 1) ++ cm
 	}
 
-	/* CLIENT_HELLO byte ++ 
-	 * size (3 bytes) ++ 
-	 * vmaj ++ vmin ++ 
-	 * random (32 bytes) ++ 
-	 * session id (length + content) ++ 
-	 * cipher suite list (len_16 && list) 
-	 * ++ compress method list (len_8 && list)
-	 */
-	def genClientHello(): Array[Byte] = {
-		val payload = Array[Byte](MAJVER, MINVER) ++ genRandom(32) ++ Array[Byte](0) ++ cipherSuiteList ++ compressMethodList
-		Array[Byte](CLIENT_HELLO) ++ intToByteArray(payload.length, 3) ++ payload
+	val clientRandom: Array[Byte] = {
+		val random = genRandom(32)
+		conn.clientRandom = random
+		random
+	}
+
+	val payload: Array[Byte] = {
+		Array[Byte](MAJVER, MINVER) ++ clientRandom ++ Array[Byte](0) ++ cipherSuiteList ++ compressMethodList
+	}
+
+	def serialize(): Array[Byte] = {
+		SSLRecord.createHandshake(Handshake.genClientHelloHandshake(payload)).serialize
 	}
 }

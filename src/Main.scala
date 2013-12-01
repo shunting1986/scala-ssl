@@ -9,10 +9,9 @@ object Main {
 		val conn = new SSLConnection(host, port)
 
 		conn.sendClientHello
+		conn.recvServerHandshake
 
-		val sh = conn.recvServerHello
 		conn.sendClientKeyExchange
-
 		conn.sendClientChangeCipherSpec
 		conn.sendClientFinishedHandshake
 		spin
