@@ -6,6 +6,7 @@ import util.Util._
 import util.Util
 import crypto._
 import cert._
+import ssl.SSLConstants._
 
 /* This class manage all the low level socket read/write */
 class SSLConnection(host: String, port: Int) {
@@ -22,7 +23,9 @@ class SSLConnection(host: String, port: Int) {
 	var clientMACKey = Array[Byte]()
 	var serverMACKey = Array[Byte]()
 	var clientWriteKey = Array[Byte]()
+	var clientWriteRC4: RC4 = null
 	var serverWriteKey = Array[Byte]()
+	var serverWriteRC4: RC4 = null
 
 	// sequence number
 	var sendSeq = 0
@@ -68,6 +71,6 @@ class SSLConnection(host: String, port: Int) {
 	}
 
 	def sendClientFinishedHandshake {
-		sys.error("ni")
+		send(SSLRecord.createHandshake((new FinishedHS(this, CLIENT_TO_SERVER)).serialize).serialize)
 	}
 }

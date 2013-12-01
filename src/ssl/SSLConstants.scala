@@ -10,4 +10,8 @@ object SSLConstants {
 	// version
 	def MAJVER: Byte = 0x03
 	def MINVER: Byte = 0x00
+
+	// direction
+	def CLIENT_TO_SERVER = 0
+	def SERVER_TO_CLIENT = 1
 }

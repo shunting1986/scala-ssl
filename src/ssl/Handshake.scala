@@ -11,6 +11,7 @@ object Handshake {
 	def CERTIFICATE: Byte = 11
 	def SERVER_HELLO_DONE: Byte = 14
 	def CLIENT_KEY_EXCHANGE = 0x10
+	def FINISHED = 0x14
 
 	def genClientHelloHandshake(payload: Array[Byte]): Array[Byte] = {
 		genHandshake(CLIENT_HELLO, payload)
@@ -18,6 +19,10 @@ object Handshake {
 
 	def genClientKeyExchange(payload: Array[Byte]): Array[Byte] = {
 		genHandshake(CLIENT_KEY_EXCHANGE, payload)
+	}
+
+	def genFinished(payload: Array[Byte]): Array[Byte] = {
+		genHandshake(FINISHED, payload)
 	}
 
 	def genHandshake(hkType: Int, payload: Array[Byte]): Array[Byte] = {

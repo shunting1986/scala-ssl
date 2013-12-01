@@ -24,7 +24,9 @@ class ClientKeyExchange(conn: SSLConnection) {
 		conn.clientMACKey = keyblock.slice(0, 16)
 		conn.serverMACKey = keyblock.slice(16, 32)
 		conn.clientWriteKey = keyblock.slice(32, 48)
+		conn.clientWriteRC4 = new RC4(conn.clientWriteKey)
 		conn.serverWriteKey = keyblock.slice(48, 64)
+		conn.serverWriteRC4 = new RC4(conn.serverWriteKey)
 	}
 
 	def serialize: Array[Byte] = {

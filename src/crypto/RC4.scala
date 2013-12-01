@@ -7,7 +7,6 @@ object RC4 {
 		val fcont = Util.readFile("/tmp/rc4-key")
 		// Util.dumpByteArray(Util.hexToBin(fcont.getBytes))
 		val rc4 = new RC4(Util.hexToBin(fcont.getBytes))
-		rc4.initialize
 
 		val input = Util.hexToBin(Util.fileToByteArray("/tmp/rc4-plain"))
 		Util.dumpByteArray(rc4.encrypt(input))
@@ -16,7 +15,7 @@ object RC4 {
 
 class RC4(key: Array[Byte]) {
 	val state = new Array[Int](256)
-	def initialize() {
+	val dummy = {
 		var i = 0
 		while (i < 256) {
 			state(i) = i
