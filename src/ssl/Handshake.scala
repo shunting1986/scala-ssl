@@ -40,8 +40,10 @@ class Handshake(conn: SSLConnection) {
 		if (typ == Handshake.SERVER_HELLO) {
 			(new ServerHello(conn)).decode(data)
 		} else if (typ == Handshake.CERTIFICATE) {
+			conn.serverCertReceived = true
 			(new CertificateHS(conn)).decode(data)
 		} else if (typ == Handshake.SERVER_HELLO_DONE) {
+			conn.serverHelloDoneReceived = true
 			decodeServerHelloDone(data)
 		} else {
 			printf("Type = %d\n", typ)

@@ -11,7 +11,7 @@ object SHA1 {
 	}
 }
 
-class SHA1 {
+class SHA1 extends Hash {
 	// big endian
 	// assume v is not negative
 	def longToByteArray(v: Long): Array[Byte] = {
@@ -50,7 +50,7 @@ class SHA1 {
 		trunc((v << c) | (v >> (32 - c)))
 	}
 
-	def doHash(input: Array[Byte]): Array[Byte] = {
+	override def doHash(input: Array[Byte]): Array[Byte] = {
 		val afterPadding = doPadding(input)
 
 		var h0 = 0x67452301L

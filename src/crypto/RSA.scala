@@ -7,22 +7,27 @@ import cert._
 object RSA {
 	def main(args: Array[String]) {
 		// Do encryption first
+		/*
 		val cert = new X509Certificate
 		cert.parsePemFile("/tmp/server.crt")
+		 */
 
 		// plain text
+		/*
 		val plainText = streamToByteArray(System.in)
 		printf("Origin Plain Text:\n")
 		dumpByteArray(plainText)
+		 */
 
 		// do encryption
 		val rsa = new RSA
-		val genCipherText = rsa.encrypt(plainText, cert.publicKey)
+		val cipherHex = fileToByteArray("/tmp/zz")
+		val cipherBin = hexToBin(cipherHex)
 
 		val privateKey = new PrivateKey
 		privateKey.parsePemFile("/tmp/server.key")
 
-		val genPlainText = rsa.decrypt(genCipherText, privateKey)
+		val genPlainText = rsa.decrypt(cipherBin, privateKey)
 		printf("generated plain text:\n")
 		dumpByteArray(genPlainText)
 	}
@@ -80,6 +85,7 @@ class RSA {
 		val mbitlen = modulus.bitLength
 		val mbytelen = (mbitlen + 7) / 8 
 		val resAr = bigIntToByteArray(resBi, mbytelen)
+
 		assert(resAr(0) == 0)
 		assert(resAr(1) == 2)
 

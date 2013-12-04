@@ -5,12 +5,15 @@ import ssl.SSLConstants._
 
 class ClientHello(conn: SSLConnection) {
 	def cipherSuiteList: Array[Byte] = {
-		val cs = intToByteArray(SSL_RSA_WITH_RC4_128_MD5, 2)
+		var cs = intToByteArray(SSL_RSA_WITH_RC4_128_MD5, 2) 
+		// cs = cs ++ intToByteArray(0xff, 2) // Is this important?? This will make some difference!
 		intToByteArray(cs.length, 2) ++ cs
 	}
 	
 	def compressMethodList: Array[Byte] = {
-		val cm = intToByteArray(NULL_COMPRESS, 1)
+		var cm = Array[Byte]()
+		// cm = cm ++ intToByteArray(1, 1) // Is this important?
+		cm = cm ++ intToByteArray(NULL_COMPRESS, 1)
 		intToByteArray(cm.length, 1) ++ cm
 	}
 
@@ -25,6 +28,8 @@ class ClientHello(conn: SSLConnection) {
 	}
 
 	def serialize(): Array[Byte] = {
-		SSLRecord.createHandshake(Handshake.genClientHelloHandshake(payload)).serialize
+		val hkData = Handshake.genClientHelloHandshake(payload)
+		conn.recordHandshake(hkData)
+		SSLRecord.createHandshake(hkData).serialize
 	}
 }

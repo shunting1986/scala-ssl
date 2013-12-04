@@ -6,6 +6,5 @@ compile:
 	find src -name *.scala | xargs $(SCALAC) -d classes
 
 run:
-	@#$(SCALA) -classpath classes cert.PrivateKey /home/shunting/work/ubuntu-contents/learn-lang/proj/ssl/certs/server.key
-	@#$(SCALA) -classpath classes util.Base64
-	$(SCALA) -classpath classes Main
+	@$(SCALA) -classpath classes Main
+

@@ -23,6 +23,7 @@ class ServerHandshake(conn: SSLConnection) extends Handshake(conn) {
 		val len = validateHeader(header)
 		var data = conn.recv(len)
 
+		conn.recordHandshake(data)
 		while (data.length > 0) {
 			assert(data.length >= 4)
 			val typ = byteArrayToInt(data.dropRight(data.length - 1))

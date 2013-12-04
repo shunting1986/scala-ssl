@@ -5,13 +5,15 @@ import crypto._
 
 class ClientKeyExchange(conn: SSLConnection) {
 	// generate PreMasterSecret
-	val pms = Util.genRandom(48)
+	val pms = Array[Byte](3, 0) ++ Util.genRandom(46)  // tricky how I find this...
+
 	val prfAgt = new PRF
 	val ms = {
 		val output = new Array[Byte](48)
 		assert(conn.clientRandom != null)
 		assert(conn.serverRandom != null)
 		prfAgt.prf(pms, conn.clientRandom, conn.serverRandom, output)
+		conn.masterSecret = output
 		output
 	}
 	val keyblock = {
@@ -34,7 +36,7 @@ class ClientKeyExchange(conn: SSLConnection) {
 		assert(conn.publicKey != null)
 
 		val rsa = new RSA
-		val epms = rsa.encrypt(pms, conn.publicKey)
+		val epms = rsa.encrypt(pms, conn.publicKey) 
 
 		// send the encrypted PreMasterSecret
 		Handshake.genClientKeyExchange(epms)

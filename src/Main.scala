@@ -10,10 +10,17 @@ object Main {
 
 		conn.sendClientHello
 		conn.recvServerHandshake
+		if (!conn.serverCertReceived) {
+			conn.recvServerHandshake
+		}
+		if (!conn.serverHelloDoneReceived) {
+			conn.recvServerHandshake
+		}
 
 		conn.sendClientKeyExchange
 		conn.sendClientChangeCipherSpec
 		conn.sendClientFinishedHandshake
+
 		spin
 	}
 }

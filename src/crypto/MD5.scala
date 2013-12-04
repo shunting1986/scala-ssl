@@ -13,7 +13,7 @@ object MD5 {
 	}
 }
 
-class MD5 {
+class MD5 extends Hash {
 	def k = Array[Long](
 		0xd76aa478L, 0xe8c7b756L, 0x242070dbL, 0xc1bdceeeL,
 		0xf57c0fafL, 0x4787c62aL, 0xa8304613L, 0xfd469501L,
@@ -83,7 +83,7 @@ class MD5 {
 		trunc((v << c) | (v >> (32 - c)))
 	}
 
-	def doHash(input: Array[Byte]): Array[Byte] = {
+	override def doHash(input: Array[Byte]): Array[Byte] = {
 		var afterPadding = doPadding(input)
 		var h0 = 0x67452301L
 		var h1 = 0xefcdab89L

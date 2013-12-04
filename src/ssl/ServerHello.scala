@@ -28,6 +28,10 @@ class ServerHello(conn: SSLConnection) {
 		val compressMethod = reader.nextInt(1)
 		printf("CompressMethod %d\n", compressMethod)
 
-		assert(!reader.hasMore)
+		// assert(!reader.hasMore)
+		if (reader.hasMore) {
+			printf("+++++++ Server Hello has more information: \n")
+			dumpByteArray(reader.getData)
+		}
 	}
 }

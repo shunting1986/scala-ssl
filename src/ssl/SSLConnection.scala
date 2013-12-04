@@ -27,6 +27,8 @@ class SSLConnection(host: String, port: Int) {
 	var serverWriteKey = Array[Byte]()
 	var serverWriteRC4: RC4 = null
 
+	var masterSecret: Array[Byte] = null
+
 	// sequence number
 	var sendSeq = 0
 	var recvSeq = 0
@@ -35,13 +37,40 @@ class SSLConnection(host: String, port: Int) {
 	var clientRandom: Array[Byte] = null
 	var serverRandom: Array[Byte] = null
 
+	// flags
+	// var doRecording = true
+	var recordedHandshakes = Array[Byte]()
+
+	var serverCertReceived = false
+	var serverHelloDoneReceived = false
+
+	/*
+	 * NOTE:
+	 * 1. only record handshake message before the client Finish handshake message
+	 * 2. the content type header is not counted
+	 */
+	def recordHandshake(hkData: Array[Byte]) {
+		recordedHandshakes = recordedHandshakes ++ hkData
+	}
+
 	def send(msg: Array[Byte]) {
 		os.write(msg)
+		/*
+		if (doRecording) {
+			recordedHandshakes = recordedHandshakes ++ msg
+		}
+		 */
 	}
 
 	val sbArray = new StreamBasedArray(is)
 	def recv(len: Int): Array[Byte] = {
-		sbArray.nextBytes(len)
+		val res = sbArray.nextBytes(len)
+		/*
+		if (doRecording) {
+			recordedHandshakes = recordedHandshakes ++ res
+		}
+		 */
+		res
 	}
 
 	def sendClientHello() {
@@ -56,7 +85,9 @@ class SSLConnection(host: String, port: Int) {
 	 * Client send the 'ClientKeyExchange' handshake to server
 	 */
 	def sendClientKeyExchange() = {
-		send(SSLRecord.createHandshake((new ClientKeyExchange(this)).serialize).serialize)
+		val hkData = (new ClientKeyExchange(this)).serialize
+		recordHandshake(hkData)
+		send(SSLRecord.createHandshake(hkData).serialize)
 
 		printf("Client MAC Key: "); dumpByteArray(clientMACKey)
 		printf("Server MAC Key: "); dumpByteArray(serverMACKey)
@@ -66,6 +97,7 @@ class SSLConnection(host: String, port: Int) {
 
 	def sendClientChangeCipherSpec {
 		// sample 14 03 00 00 01 01 
+		// doRecording = false // do not record the ChangeCipherSpec sent by client which is not a handshake
 		val record = SSLRecord.createChangeCipherSpec(Array[Byte](1))
 		send(record.serialize)
 	}
