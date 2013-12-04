@@ -5,22 +5,9 @@ import ssl.SSLConstants._
 import ssl.SSLRecord._
 
 class ServerHandshake(conn: SSLConnection) extends Handshake(conn) {
-	def validateHeader(header: Array[Byte]):Int = {
-		val ct = header(0)
-		val vermaj = header(1)
-		val vermin = header(2)
-		val len = byteArrayToInt(header.drop(3))	
-
-		assert(ct == CT_HANDSHAKE)
-		assert(vermaj == MAJVER)
-		assert(vermin == MINVER)
-
-		len
-	}
-
 	def recvServerHandshake = {
 		val header = conn.recv(5)
-		val len = validateHeader(header)
+		val len = SSLRecord.validateHeader(header, CT_HANDSHAKE)
 		var data = conn.recv(len)
 
 		conn.recordHandshake(data)

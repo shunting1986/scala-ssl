@@ -7,6 +7,7 @@ import util.Util
 import crypto._
 import cert._
 import ssl.SSLConstants._
+import ssl.SSLRecord._
 
 /* This class manage all the low level socket read/write */
 class SSLConnection(host: String, port: Int) {
@@ -79,6 +80,15 @@ class SSLConnection(host: String, port: Int) {
 
 	def recvServerHandshake() = {
 		(new ServerHandshake(this)).recvServerHandshake
+	}
+
+	def recvServerChangeCipherSpec = {
+		val header = recv(5)
+		val len = SSLRecord.validateHeader(header, CT_CHANGE_CIPHER_SPEC)
+		val data = recv(len)
+		assert(len == 1)
+		assert(data(0) == 1.asInstanceOf[Byte])
+		printf("GET Server change cipher spec\n");
 	}
 
 	/*

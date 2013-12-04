@@ -2,6 +2,7 @@ package ssl
 
 import util.Util._
 import ssl.SSLConstants._
+import ssl._
 
 object SSLRecord {
 	def CT_CHANGE_CIPHER_SPEC = 0x14
@@ -13,6 +14,19 @@ object SSLRecord {
 
 	def createHandshake(data: Array[Byte]): SSLRecord = {
 		new SSLRecord(CT_HANDSHAKE, data)
+	}
+
+	def validateHeader(header: Array[Byte], expectedCT: Int):Int = {
+		val ct = header(0)
+		val vermaj = header(1)
+		val vermin = header(2)
+		val len = byteArrayToInt(header.drop(3))	
+
+		assert(ct == expectedCT.asInstanceOf[Byte])
+		assert(vermaj == MAJVER)
+		assert(vermin == MINVER)
+
+		len
 	}
 }
 
