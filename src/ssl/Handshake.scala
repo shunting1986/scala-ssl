@@ -4,6 +4,7 @@ import util.Util._
 import util.ArrayBasedReader
 import der.DerNode
 import cert._
+import ssl.SSLConstants._
 
 object Handshake {
 	def CLIENT_HELLO = 0x01
@@ -45,6 +46,10 @@ class Handshake(conn: SSLConnection) {
 		} else if (typ == Handshake.SERVER_HELLO_DONE) {
 			conn.serverHelloDoneReceived = true
 			decodeServerHelloDone(data)
+		} else if (typ == Handshake.FINISHED) { 
+			val finishAgt = new FinishedHS(conn, SERVER_TO_CLIENT) 
+			finishAgt.verifyServerFinishMsg(data)
+			printf("Pass validation for server finished message\n")
 		} else {
 			printf("Type = %d\n", typ)
 			sys.error("Unsupported type")

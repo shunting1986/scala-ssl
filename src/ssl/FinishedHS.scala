@@ -35,6 +35,8 @@ class FinishedHS(conn: SSLConnection, dir: Int) {
 		val payload = md5Hash ++ sha1Hash
 		val plainText = Handshake.genFinished(payload)
 
+		conn.recordHandshakeCond(plainText)
+
 		val rc4 = if (dir == SSLConstants.CLIENT_TO_SERVER) conn.clientWriteRC4 else conn.serverWriteRC4
 		var hmac = Array[Byte]()
 		val hmacAgt = new RecordHMAC(conn)
@@ -47,5 +49,10 @@ class FinishedHS(conn: SSLConnection, dir: Int) {
 		val cipherText = rc4.encrypt(plainText ++ hmac)
 
 		cipherText
+	}
+
+	def verifyServerFinishMsg(data: Array[Byte]) {
+		val exp = md5Hash ++ sha1Hash
+		assert(byteArrayEq(exp, data))
 	}
 }

@@ -116,7 +116,8 @@ class SSLConnection(host: String, port: Int) {
 	}
 
 	def sendClientFinishedHandshake {
+		val hkData = (new FinishedHS(this, CLIENT_TO_SERVER)).serialize
+		send(SSLRecord.createHandshake(hkData).serialize)
 		finishRecording = true
-		send(SSLRecord.createHandshake((new FinishedHS(this, CLIENT_TO_SERVER)).serialize).serialize)
 	}
 }
