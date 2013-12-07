@@ -9,8 +9,21 @@ class ServerHandshake(conn: SSLConnection) extends Handshake(conn) {
 		val header = conn.recv(5)
 		val len = SSLRecord.validateHeader(header, CT_HANDSHAKE)
 		var data = conn.recv(len)
+	
+		if (conn.needDecrypt) {
+			data = conn.decryptServerData(data)
+			assert(data.length > 16)
+			
+			val actHmac = data.slice(data.length - 16, data.length)
+			data = data.slice(0, data.length - 16)
 
-		conn.recordHandshake(data)
+			val hmacAgt = new RecordHMAC(conn)
+			val expHmac = hmacAgt.genServerHMAC(CT_HANDSHAKE, data)
+
+			assert(byteArrayEq(actHmac, expHmac))
+		}
+
+		conn.recordHandshakeCond(data)
 		while (data.length > 0) {
 			assert(data.length >= 4)
 			val typ = byteArrayToInt(data.dropRight(data.length - 1))

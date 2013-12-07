@@ -31,19 +31,21 @@ class SSLConnection(host: String, port: Int) {
 	var masterSecret: Array[Byte] = null
 
 	// sequence number
-	var sendSeq = 0
-	var recvSeq = 0
+	var clientSeq = 0
+	var serverSeq = 0
 
 	// client/server random
 	var clientRandom: Array[Byte] = null
 	var serverRandom: Array[Byte] = null
 
-	// flags
-	// var doRecording = true
+	// record handshake messages
+	var finishRecording = false
 	var recordedHandshakes = Array[Byte]()
 
+	// flags
 	var serverCertReceived = false
 	var serverHelloDoneReceived = false
+	var needDecrypt = false
 
 	/*
 	 * NOTE:
@@ -54,24 +56,24 @@ class SSLConnection(host: String, port: Int) {
 		recordedHandshakes = recordedHandshakes ++ hkData
 	}
 
+	def recordHandshakeCond(hkData: Array[Byte]) {
+		if (!finishRecording) {
+			recordHandshake(hkData)
+		}
+	}
+
 	def send(msg: Array[Byte]) {
 		os.write(msg)
-		/*
-		if (doRecording) {
-			recordedHandshakes = recordedHandshakes ++ msg
-		}
-		 */
 	}
 
 	val sbArray = new StreamBasedArray(is)
 	def recv(len: Int): Array[Byte] = {
-		val res = sbArray.nextBytes(len)
-		/*
-		if (doRecording) {
-			recordedHandshakes = recordedHandshakes ++ res
-		}
-		 */
-		res
+		sbArray.nextBytes(len)
+	}
+
+	def decryptServerData(origData: Array[Byte]): Array[Byte] = {
+		val decData = serverWriteRC4.decrypt(origData)
+		decData
 	}
 
 	def sendClientHello() {
@@ -89,6 +91,7 @@ class SSLConnection(host: String, port: Int) {
 		assert(len == 1)
 		assert(data(0) == 1.asInstanceOf[Byte])
 		printf("GET Server change cipher spec\n");
+		this.needDecrypt = true
 	}
 
 	/*
@@ -113,6 +116,7 @@ class SSLConnection(host: String, port: Int) {
 	}
 
 	def sendClientFinishedHandshake {
+		finishRecording = true
 		send(SSLRecord.createHandshake((new FinishedHS(this, CLIENT_TO_SERVER)).serialize).serialize)
 	}
 }

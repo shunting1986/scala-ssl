@@ -19,7 +19,7 @@ object RecordHMAC {
 		  | 01 60 eb b3 da 66 e3 16 51 03 cd 33 66 af 92 23 
 		  | e0 72 b2 b9 b5 21 44 b0""".stripMargin
 
-		val res = hmacAgt.genHMAC(hexToBin(keyStr.getBytes), ct, hexToBin(dataStr.getBytes))
+		val res = hmacAgt.genHMAC(hexToBin(keyStr.getBytes), ct, hexToBin(dataStr.getBytes), 0)
 		dumpByteArray(res)
 	}
 }
@@ -29,12 +29,23 @@ class RecordHMAC(conn: SSLConnection) {
 		intToByteArray(seq, 8)
 	}
 
-	def genHMAC(key: Array[Byte], contentType: Byte, data: Array[Byte]): Array[Byte] = {
+	def genClientHMAC(contentType: Int, data: Array[Byte]): Array[Byte] = {
+		val hmac = genHMAC(conn.clientMACKey, contentType.asInstanceOf[Byte], data, conn.clientSeq)
+		conn.clientSeq += 1
+		hmac
+	}
+
+	def genServerHMAC(contentType: Int, data: Array[Byte]): Array[Byte] = {
+		val hmac = genHMAC(conn.serverMACKey, contentType.asInstanceOf[Byte], data, conn.serverSeq)
+		conn.serverSeq += 1
+		hmac
+	}
+
+	def genHMAC(key: Array[Byte], contentType: Byte, data: Array[Byte], seq: Int): Array[Byte] = {
 		// NOTE: only handle MD5 right now
 		val pad_len = 48
 
-		var inputItr1 = key ++ genPadding(pad_len, 0x36.asInstanceOf[Byte]) ++ fmtSeq(conn.sendSeq) ++ Array[Byte](contentType) ++ intToByteArray(data.length, 2) ++ data
-		conn.sendSeq += 1
+		var inputItr1 = key ++ genPadding(pad_len, 0x36.asInstanceOf[Byte]) ++ fmtSeq(seq) ++ Array[Byte](contentType) ++ intToByteArray(data.length, 2) ++ data
 		val md5 = new MD5
 		var hashItr1 = md5.doHash(inputItr1)
 

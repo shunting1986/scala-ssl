@@ -22,6 +22,7 @@ object Main {
 		conn.sendClientFinishedHandshake
 
 		conn.recvServerChangeCipherSpec
+		conn.recvServerHandshake // actually used to receive the server Finish record
 
 		spin
 	}

@@ -157,6 +157,26 @@ object Util {
 		ar
 	}
 
+	def byteArrayEq(lhs: Array[Byte], rhs: Array[Byte]): Boolean = {
+		def byteArrayEqEx(ind: Int): Boolean = {
+			if (ind >= lhs.length) {
+				true
+			} else {
+				lhs(ind) == rhs(ind) && byteArrayEqEx(ind + 1)
+			}
+		}
+
+		if (lhs == null && rhs == null) {
+			true
+		} else if (lhs == null || rhs == null) {
+			false
+		} else if (lhs.length != rhs.length) {	
+			false
+		} else {
+			byteArrayEqEx(0)
+		}
+	}
+
 	def main(args: Array[String]) {
 		val input = streamToByteArray(System.in)
 		val output = hexToBin(input)
