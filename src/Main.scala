@@ -24,6 +24,8 @@ object Main {
 		conn.recvServerChangeCipherSpec
 		conn.recvServerHandshake // actually used to receive the server Finish record
 
+		conn.sendAppData("GET /hi HTTP/1.0\n\n".getBytes)
+
 		spin
 	}
 }

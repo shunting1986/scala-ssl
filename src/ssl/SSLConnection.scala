@@ -62,6 +62,14 @@ class SSLConnection(host: String, port: Int) {
 		}
 	}
 
+	def sendAppData(plainText: Array[Byte]) {
+		val rc4 = this.clientWriteRC4 
+		val hmacAgt = new RecordHMAC(this)
+		var hmac = hmacAgt.genClientHMAC(SSLRecord.CT_APPLICATION_DATA.asInstanceOf[Byte], plainText)
+		val cipherText = rc4.encrypt(plainText ++ hmac)
+		send(SSLRecord.createApplicationData(cipherText).serialize)
+	}
+
 	def send(msg: Array[Byte]) {
 		os.write(msg)
 	}

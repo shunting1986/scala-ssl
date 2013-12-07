@@ -7,6 +7,7 @@ import ssl._
 object SSLRecord {
 	def CT_CHANGE_CIPHER_SPEC = 0x14
 	def CT_HANDSHAKE = 0x16
+	def CT_APPLICATION_DATA = 0x17
 
 	def createChangeCipherSpec(data: Array[Byte]): SSLRecord = {
 		new SSLRecord(CT_CHANGE_CIPHER_SPEC, data)
@@ -14,6 +15,10 @@ object SSLRecord {
 
 	def createHandshake(data: Array[Byte]): SSLRecord = {
 		new SSLRecord(CT_HANDSHAKE, data)
+	}
+
+	def createApplicationData(data: Array[Byte]): SSLRecord = {
+		new SSLRecord(CT_APPLICATION_DATA, data)
 	}
 
 	def validateHeader(header: Array[Byte], expectedCT: Int):Int = {
