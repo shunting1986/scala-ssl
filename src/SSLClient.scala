@@ -2,7 +2,7 @@ import ssl._
 import util.Util._
 import util.StreamBasedArray
 
-object Main {
+object SSLClient {
 	def main(args: Array[String]) {
 		val host = "127.0.0.1"
 		val port = 8443
@@ -25,8 +25,15 @@ object Main {
 		conn.recvServerHandshake // actually used to receive the server Finish record
 
 		conn.sendAppData("GET /hi HTTP/1.0\n\n".getBytes)
+		printf("============= BEGIN DATA ===============\n")
+		conn.recvAppData
+		printf("============= END   DATA ===============\n")
 
-		spin
+		conn.recvServerAlert
+		conn.sendClientAlert
+	
+		conn.close
+		// spin
 	}
 }
 

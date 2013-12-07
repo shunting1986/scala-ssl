@@ -47,6 +47,10 @@ class SSLConnection(host: String, port: Int) {
 	var serverHelloDoneReceived = false
 	var needDecrypt = false
 
+	def close {
+		sock.close
+	}
+
 	/*
 	 * NOTE:
 	 * 1. only record handshake message before the client Finish handshake message
@@ -62,14 +66,6 @@ class SSLConnection(host: String, port: Int) {
 		}
 	}
 
-	def sendAppData(plainText: Array[Byte]) {
-		val rc4 = this.clientWriteRC4 
-		val hmacAgt = new RecordHMAC(this)
-		var hmac = hmacAgt.genClientHMAC(SSLRecord.CT_APPLICATION_DATA.asInstanceOf[Byte], plainText)
-		val cipherText = rc4.encrypt(plainText ++ hmac)
-		send(SSLRecord.createApplicationData(cipherText).serialize)
-	}
-
 	def send(msg: Array[Byte]) {
 		os.write(msg)
 	}
@@ -77,6 +73,20 @@ class SSLConnection(host: String, port: Int) {
 	val sbArray = new StreamBasedArray(is)
 	def recv(len: Int): Array[Byte] = {
 		sbArray.nextBytes(len)
+	}
+
+	def decryptVerifyServerData(contentType: Int, origData: Array[Byte]): Array[Byte] = {
+		var data = this.decryptServerData(origData)
+		assert(data.length > 16)
+		
+		val actHmac = data.slice(data.length - 16, data.length)
+		data = data.slice(0, data.length - 16)
+
+		val hmacAgt = new RecordHMAC(this)
+		val expHmac = hmacAgt.genServerHMAC(contentType, data)
+
+		assert(byteArrayEq(actHmac, expHmac))
+		data
 	}
 
 	def decryptServerData(origData: Array[Byte]): Array[Byte] = {
@@ -127,5 +137,43 @@ class SSLConnection(host: String, port: Int) {
 		val hkData = (new FinishedHS(this, CLIENT_TO_SERVER)).serialize
 		send(SSLRecord.createHandshake(hkData).serialize)
 		finishRecording = true
+	}
+
+	def sendClientRecord(contentType: Int, plainText: Array[Byte]) {
+		val rc4 = this.clientWriteRC4 
+		val hmacAgt = new RecordHMAC(this)
+		var hmac = hmacAgt.genClientHMAC(contentType.asInstanceOf[Byte], plainText)
+		val cipherText = rc4.encrypt(plainText ++ hmac)
+		send((new SSLRecord(contentType, cipherText)).serialize)
+	}
+
+	def sendAppData(plainText: Array[Byte]) {
+		sendClientRecord(SSLRecord.CT_APPLICATION_DATA, plainText)
+	}
+
+	def sendClientAlert {
+		val data = Array[Byte](Alert.LEVEL_WARNING.asInstanceOf[Byte], Alert.DESC_CLOSE_NOTIFY.asInstanceOf[Byte])
+		sendClientRecord(SSLRecord.CT_ALERT, data)
+	}
+
+	def recvAppData {
+		val header = recv(5)
+		val len = SSLRecord.validateHeader(header, CT_APPLICATION_DATA)
+		var data = recv(len)
+
+		data = decryptVerifyServerData(CT_APPLICATION_DATA, data)
+		printf(new String(data))
+	}
+
+	def recvServerAlert {
+		val header = recv(5)
+		val len = SSLRecord.validateHeader(header, CT_ALERT)
+		var data = recv(len)
+
+		data = decryptVerifyServerData(CT_ALERT, data)
+		assert(data.length == 2)
+
+		val alertObj = new Alert(data(0), data(1))
+		println(alertObj)
 	}
 }

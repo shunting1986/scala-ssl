@@ -6,6 +6,7 @@ import ssl._
 
 object SSLRecord {
 	def CT_CHANGE_CIPHER_SPEC = 0x14
+	def CT_ALERT = 0x15
 	def CT_HANDSHAKE = 0x16
 	def CT_APPLICATION_DATA = 0x17
 
