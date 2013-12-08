@@ -46,6 +46,10 @@ object Handshake {
 		genHandshake(FINISHED, payload)
 	}
 
+	def parseFinished(payload: Array[Byte]): Array[Byte] = {
+		parseHandshake(FINISHED, payload)
+	}
+
 	def genHandshake(hkType: Int, payload: Array[Byte]): Array[Byte] = {
 		Array[Byte](hkType.asInstanceOf[Byte]) ++ intToByteArray(payload.length, 3) ++ payload
 	}

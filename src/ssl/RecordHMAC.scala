@@ -2,6 +2,7 @@ package ssl
 
 import util.Util._
 import crypto._
+import ssl.SSLConstants._
 
 object RecordHMAC {
 	def main(args: Array[String]) {
@@ -24,9 +25,17 @@ object RecordHMAC {
 	}
 }
 
-class RecordHMAC(conn: SSLClientConnection) {
+class RecordHMAC(conn: SSLConnection) {
 	def fmtSeq(seq: Int): Array[Byte] = {
 		intToByteArray(seq, 8)
+	}
+
+	def genHMAC(entityId: Int, contentType: Int, data: Array[Byte]): Array[Byte] = {	
+		if (entityId == CLIENT) {
+			genClientHMAC(contentType, data)
+		} else {
+			genServerHMAC(contentType, data)
+		}
 	}
 
 	def genClientHMAC(contentType: Int, data: Array[Byte]): Array[Byte] = {
@@ -41,7 +50,7 @@ class RecordHMAC(conn: SSLClientConnection) {
 		hmac
 	}
 
-	def genHMAC(key: Array[Byte], contentType: Byte, data: Array[Byte], seq: Int): Array[Byte] = {
+	private def genHMAC(key: Array[Byte], contentType: Byte, data: Array[Byte], seq: Int): Array[Byte] = {
 		// NOTE: only handle MD5 right now
 		val pad_len = 48
 

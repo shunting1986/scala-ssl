@@ -6,7 +6,7 @@ import crypto._
 import util.Util._
 import ssl.SSLRecord._
 
-class SSLConnection(sock: Socket) {
+abstract class SSLConnection(sock: Socket) {
 	// IO
 	val os = if (sock == null) null else sock.getOutputStream
 	val is = if (sock == null) null else sock.getInputStream
@@ -84,6 +84,23 @@ class SSLConnection(sock: Socket) {
 		assert(len == 1)
 		assert(data(0) == 1.asInstanceOf[Byte])
 		this.needDecrypt = true
+	}
+
+	def decryptData(origData: Array[Byte]): Array[Byte]
+
+	// hmacEntity indicates we should generate which sides hmac
+	def decryptVerifyData(hmacEntity: Int, contentType: Int, origData: Array[Byte]): Array[Byte] = {
+		var data = decryptData(origData)
+		assert(data.length > 16)
+		
+		val actHmac = data.slice(data.length - 16, data.length)
+		data = data.slice(0, data.length - 16)
+
+		val hmacAgt = new RecordHMAC(this)
+		val expHmac = hmacAgt.genHMAC(hmacEntity, contentType, data)
+
+		assert(byteArrayEq(actHmac, expHmac))
+		data
 	}
 
 

@@ -20,22 +20,11 @@ class SSLClientConnection(sock: Socket) extends SSLConnection(sock) {
 	var serverHelloDoneReceived = false
 
 	def decryptVerifyServerData(contentType: Int, origData: Array[Byte]): Array[Byte] = {
-		var data = this.decryptServerData(origData)
-		assert(data.length > 16)
-		
-		val actHmac = data.slice(data.length - 16, data.length)
-		data = data.slice(0, data.length - 16)
-
-		val hmacAgt = new RecordHMAC(this)
-		val expHmac = hmacAgt.genServerHMAC(contentType, data)
-
-		assert(byteArrayEq(actHmac, expHmac))
-		data
+		decryptVerifyData(SERVER, contentType, origData)
 	}
 
-	def decryptServerData(origData: Array[Byte]): Array[Byte] = {
-		val decData = serverWriteRC4.decrypt(origData)
-		decData
+	override def decryptData(origData: Array[Byte]): Array[Byte] = {
+		serverWriteRC4.decrypt(origData)
 	}
 
 	// client need this

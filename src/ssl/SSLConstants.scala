@@ -14,4 +14,8 @@ object SSLConstants {
 	// direction
 	def CLIENT_TO_SERVER = 0
 	def SERVER_TO_CLIENT = 1
+
+	// entity id
+	def CLIENT = 0
+	def SERVER = 1
 }

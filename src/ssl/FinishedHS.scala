@@ -4,7 +4,7 @@ import util.Util._
 import crypto._
 import ssl.SSLConstants._
 
-class FinishedHS(conn: SSLClientConnection, dir: Int) {
+class FinishedHS(conn: SSLConnection, dir: Int) {
 	val SENDER_CLIENT = 0x434c4e54
 	val SENDER_SERVER = 0x53525652
 	
@@ -51,8 +51,16 @@ class FinishedHS(conn: SSLClientConnection, dir: Int) {
 		cipherText
 	}
 
-	def verifyServerFinishMsg(data: Array[Byte]) {
+	private def verifyFinishMsg(data: Array[Byte]) {
 		val exp = md5Hash ++ sha1Hash
 		assert(byteArrayEq(exp, data))
+	}
+
+	def verifyServerFinishMsg(data: Array[Byte]) {
+		verifyFinishMsg(data)
+	}
+
+	def verifyClientFinishMsg(data: Array[Byte]) {
+		verifyFinishMsg(data)
 	}
 }
