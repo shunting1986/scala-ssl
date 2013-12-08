@@ -18,6 +18,10 @@ object Handshake {
 		genHandshake(CLIENT_HELLO, payload)
 	}
 
+	def parseClientHello(payload: Array[Byte]): Array[Byte] = {
+		parseHandshake(CLIENT_HELLO, payload)
+	}
+
 	def genClientKeyExchange(payload: Array[Byte]): Array[Byte] = {
 		genHandshake(CLIENT_KEY_EXCHANGE, payload)
 	}
@@ -28,6 +32,16 @@ object Handshake {
 
 	def genHandshake(hkType: Int, payload: Array[Byte]): Array[Byte] = {
 		Array[Byte](hkType.asInstanceOf[Byte]) ++ intToByteArray(payload.length, 3) ++ payload
+	}
+
+	// this method assumes the payload only contains one handshake message
+	def parseHandshake(hkType: Int, payload: Array[Byte]): Array[Byte] = {
+		val hkTypeBt = hkType.asInstanceOf[Byte]
+		assert(hkTypeBt == payload(0))
+		val len = byteArrayToInt(payload.slice(1, 4))
+		val subdata = payload.slice(4, payload.length)
+		assert(len == subdata.length)
+		subdata
 	}
 }
 

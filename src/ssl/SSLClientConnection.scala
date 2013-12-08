@@ -10,11 +10,7 @@ import ssl.SSLConstants._
 import ssl.SSLRecord._
 
 /* This class manage all the low level socket read/write */
-class SSLClientConnection(sock: Socket) {
-	// IO
-	val os = if (sock == null) null else sock.getOutputStream
-	val is = if (sock == null) null else sock.getInputStream
-
+class SSLClientConnection(sock: Socket) extends SSLConnection(sock) {
 	// PKI
 	var serverCert: X509Certificate = null
 	def publicKey: PublicKey = serverCert.publicKey
@@ -29,50 +25,10 @@ class SSLClientConnection(sock: Socket) {
 
 	var masterSecret: Array[Byte] = null
 
-	// sequence number
-	var clientSeq = 0
-	var serverSeq = 0
-
-	// client/server random
-	var clientRandom: Array[Byte] = null
-	var serverRandom: Array[Byte] = null
-
-	// record handshake messages
-	var finishRecording = false
-	var recordedHandshakes = Array[Byte]()
-
 	// flags
 	var serverCertReceived = false
 	var serverHelloDoneReceived = false
 	var needDecrypt = false
-
-	def close {
-		sock.close
-	}
-
-	/*
-	 * NOTE:
-	 * 1. only record handshake message before the client Finish handshake message
-	 * 2. the content type header is not counted
-	 */
-	def recordHandshake(hkData: Array[Byte]) {
-		recordedHandshakes = recordedHandshakes ++ hkData
-	}
-
-	def recordHandshakeCond(hkData: Array[Byte]) {
-		if (!finishRecording) {
-			recordHandshake(hkData)
-		}
-	}
-
-	def send(msg: Array[Byte]) {
-		os.write(msg)
-	}
-
-	val sbArray = new StreamBasedArray(is)
-	def recv(len: Int): Array[Byte] = {
-		sbArray.nextBytes(len)
-	}
 
 	def decryptVerifyServerData(contentType: Int, origData: Array[Byte]): Array[Byte] = {
 		var data = this.decryptServerData(origData)
@@ -96,11 +52,6 @@ class SSLClientConnection(sock: Socket) {
 	// client need this
 	def sendClientHello() {
 		send((new ClientHello(this)).serialize)
-	}
-
-	// server need this
-	def recvClientHello() {
-		// TODO
 	}
 
 	def recvServerHandshake() = {
