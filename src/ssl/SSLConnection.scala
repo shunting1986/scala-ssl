@@ -2,6 +2,8 @@ package ssl
 
 import java.net.Socket
 import util._
+import crypto._
+import util.Util._
 
 class SSLConnection(sock: Socket) {
 	// IO
@@ -19,6 +21,16 @@ class SSLConnection(sock: Socket) {
 	// record handshake messages
 	var finishRecording = false
 	var recordedHandshakes = Array[Byte]()
+
+	// symmetric keys
+	var clientMACKey = Array[Byte]()
+	var serverMACKey = Array[Byte]()
+	var clientWriteKey = Array[Byte]()
+	var clientWriteRC4: RC4 = null
+	var serverWriteKey = Array[Byte]()
+	var serverWriteRC4: RC4 = null
+
+	var masterSecret: Array[Byte] = null
 
 	val sbArray = new StreamBasedArray(is)
 	def recv(len: Int): Array[Byte] = {
@@ -52,5 +64,12 @@ class SSLConnection(sock: Socket) {
 		if (!finishRecording) {
 			recordHandshake(hkData)
 		}
+	}
+
+	def dump4keys {
+		printf("Client MAC Key: "); dumpByteArray(clientMACKey)
+		printf("Server MAC Key: "); dumpByteArray(serverMACKey)
+		printf("Client Write Key: "); dumpByteArray(clientWriteKey)
+		printf("Server Write Key: "); dumpByteArray(serverWriteKey)
 	}
 }

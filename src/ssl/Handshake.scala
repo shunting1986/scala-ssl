@@ -38,6 +38,10 @@ object Handshake {
 		genHandshake(CLIENT_KEY_EXCHANGE, payload)
 	}
 
+	def parseClientKeyExchange(payload: Array[Byte]): Array[Byte] = {
+		parseHandshake(CLIENT_KEY_EXCHANGE, payload)
+	}
+
 	def genFinished(payload: Array[Byte]): Array[Byte] = {
 		genHandshake(FINISHED, payload)
 	}

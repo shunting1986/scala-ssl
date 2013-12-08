@@ -5,10 +5,16 @@ import ssl._
 import util.Util._
 import cert._
 
-class SSLServerConnection(sock: Socket, certPath: String) extends SSLConnection(sock) {
+class SSLServerConnection(sock: Socket, certPath: String, keyPath: String) extends SSLConnection(sock) {
 	val serverCertDer = {
 		val certObj = new X509Certificate
 		certObj.pemFileToDer(certPath)
+	}
+
+	val privateKey = {
+		val pk = new PrivateKey
+		pk.parsePemFile(keyPath)
+		pk
 	}
 
 	def recvClientHello {
@@ -35,5 +41,13 @@ class SSLServerConnection(sock: Socket, certPath: String) extends SSLConnection(
 
 		recordHandshake(hkData)
 		send(SSLRecord.createHandshake(hkData).serialize)
+	}
+
+	def recvClientKeyExchange {
+		val data = recvRecord(SSLRecord.CT_HANDSHAKE)
+		recordHandshake(data)
+		(new ClientKeyExchange(this)).parse(data)
+
+		dump4keys
 	}
 }

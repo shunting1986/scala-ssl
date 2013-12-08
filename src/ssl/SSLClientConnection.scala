@@ -15,16 +15,6 @@ class SSLClientConnection(sock: Socket) extends SSLConnection(sock) {
 	var serverCert: X509Certificate = null
 	def publicKey: PublicKey = serverCert.publicKey
 
-	// symmetric keys
-	var clientMACKey = Array[Byte]()
-	var serverMACKey = Array[Byte]()
-	var clientWriteKey = Array[Byte]()
-	var clientWriteRC4: RC4 = null
-	var serverWriteKey = Array[Byte]()
-	var serverWriteRC4: RC4 = null
-
-	var masterSecret: Array[Byte] = null
-
 	// flags
 	var serverCertReceived = false
 	var serverHelloDoneReceived = false
@@ -76,10 +66,7 @@ class SSLClientConnection(sock: Socket) extends SSLConnection(sock) {
 		recordHandshake(hkData)
 		send(SSLRecord.createHandshake(hkData).serialize)
 
-		printf("Client MAC Key: "); dumpByteArray(clientMACKey)
-		printf("Server MAC Key: "); dumpByteArray(serverMACKey)
-		printf("Client Write Key: "); dumpByteArray(clientWriteKey)
-		printf("Server Write Key: "); dumpByteArray(serverWriteKey)
+		dump4keys
 	}
 
 	def sendClientChangeCipherSpec {
