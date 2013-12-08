@@ -3,7 +3,7 @@ package ssl
 import util._
 import cert._
 
-class CertificateHS(conn: SSLConnection) {
+class CertificateHS(conn: SSLClientConnection) {
 	def decode(data: Array[Byte]) {
 		val reader = new ArrayBasedReader(data)
 		val totLen = reader.nextInt(3)

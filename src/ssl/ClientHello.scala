@@ -3,7 +3,7 @@ package ssl
 import util.Util._
 import ssl.SSLConstants._
 
-class ClientHello(conn: SSLConnection) {
+class ClientHello(conn: SSLClientConnection) {
 	def cipherSuiteList: Array[Byte] = {
 		var cs = intToByteArray(SSL_RSA_WITH_RC4_128_MD5, 2) 
 		// cs = cs ++ intToByteArray(0xff, 2) // Is this important?? This will make some difference!

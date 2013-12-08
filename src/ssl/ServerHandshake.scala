@@ -4,7 +4,7 @@ import util.Util._
 import ssl.SSLConstants._
 import ssl.SSLRecord._
 
-class ServerHandshake(conn: SSLConnection) extends Handshake(conn) {
+class ServerHandshake(conn: SSLClientConnection) extends Handshake(conn) {
 	def recvServerHandshake = {
 		val header = conn.recv(5)
 		val len = SSLRecord.validateHeader(header, CT_HANDSHAKE)

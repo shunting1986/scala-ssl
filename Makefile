@@ -5,6 +5,9 @@ SCALAC := $(SCALA_BIN_DIR)/scalac
 compile:
 	find src -name *.scala | xargs $(SCALAC) -d classes
 
-run:
+client:
 	@$(SCALA) -classpath classes SSLClient
+
+server:
+	@$(SCALA) -classpath classes SSLServer
 

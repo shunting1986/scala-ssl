@@ -4,7 +4,7 @@ import util.Util._
 import ssl.SSLConstants._
 import util._
 
-class ServerHello(conn: SSLConnection) {
+class ServerHello(conn: SSLClientConnection) {
 	def decode(data: Array[Byte]) {
 		val reader = new ArrayBasedReader(data)
 		val maj = reader.nextInt(1)

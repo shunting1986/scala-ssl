@@ -31,7 +31,7 @@ object Handshake {
 	}
 }
 
-class Handshake(conn: SSLConnection) {
+class Handshake(conn: SSLClientConnection) {
 	def decodeServerHelloDone(data: Array[Byte]) {
 		assert(data.length == 0)
 		printf("Get Server Hello Done\n")

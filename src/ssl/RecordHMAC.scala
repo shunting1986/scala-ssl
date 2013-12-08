@@ -5,7 +5,7 @@ import crypto._
 
 object RecordHMAC {
 	def main(args: Array[String]) {
-		val conn = new SSLConnection(null, 0)
+		val conn = new SSLClientConnection(null)
 		val hmacAgt = new RecordHMAC(conn)
 
 		// get key
@@ -24,7 +24,7 @@ object RecordHMAC {
 	}
 }
 
-class RecordHMAC(conn: SSLConnection) {
+class RecordHMAC(conn: SSLClientConnection) {
 	def fmtSeq(seq: Int): Array[Byte] = {
 		intToByteArray(seq, 8)
 	}

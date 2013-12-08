@@ -1,12 +1,14 @@
 import ssl._
 import util.Util._
 import util.StreamBasedArray
+import java.net.Socket
 
 object SSLClient {
 	def main(args: Array[String]) {
 		val host = "127.0.0.1"
 		val port = 8443
-		val conn = new SSLConnection(host, port)
+		val sock = new Socket(host, port)
+		val conn = new SSLClientConnection(sock)
 
 		conn.sendClientHello
 		conn.recvServerHandshake

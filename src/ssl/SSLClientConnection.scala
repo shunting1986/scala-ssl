@@ -10,9 +10,8 @@ import ssl.SSLConstants._
 import ssl.SSLRecord._
 
 /* This class manage all the low level socket read/write */
-class SSLConnection(host: String, port: Int) {
+class SSLClientConnection(sock: Socket) {
 	// IO
-	val sock = if (host == null) null else new Socket(host, port)
 	val os = if (sock == null) null else sock.getOutputStream
 	val is = if (sock == null) null else sock.getInputStream
 
@@ -94,8 +93,14 @@ class SSLConnection(host: String, port: Int) {
 		decData
 	}
 
+	// client need this
 	def sendClientHello() {
 		send((new ClientHello(this)).serialize)
+	}
+
+	// server need this
+	def recvClientHello() {
+		// TODO
 	}
 
 	def recvServerHandshake() = {

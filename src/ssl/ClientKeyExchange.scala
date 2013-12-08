@@ -3,7 +3,7 @@ package ssl
 import util._
 import crypto._
 
-class ClientKeyExchange(conn: SSLConnection) {
+class ClientKeyExchange(conn: SSLClientConnection) {
 	// generate PreMasterSecret
 	val pms = Array[Byte](3, 0) ++ Util.genRandom(46)  // tricky how I find this...
 

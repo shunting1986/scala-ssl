@@ -4,7 +4,7 @@ import util.Util._
 import crypto._
 import ssl.SSLConstants._
 
-class FinishedHS(conn: SSLConnection, dir: Int) {
+class FinishedHS(conn: SSLClientConnection, dir: Int) {
 	val SENDER_CLIENT = 0x434c4e54
 	val SENDER_SERVER = 0x53525652
 	
