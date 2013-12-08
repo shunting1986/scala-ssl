@@ -7,10 +7,13 @@ import util.Util._
 class SSLServerConnection(sock: Socket) extends SSLConnection(sock) {
 	def recvClientHello = {
 		val data = recvRecord(SSLRecord.CT_HANDSHAKE)
+		recordHandshake(data)
 		(new ClientHello(this)).parse(data)
 	}
 
 	def sendServerHello = {
-		sys.error("HALT")
+		val hkdata = (new ServerHello(this)).serialize
+		recordHandshake(hkdata)
+		send(SSLRecord.createHandshake(hkdata).serialize)
 	}
 }

@@ -22,6 +22,10 @@ object Handshake {
 		parseHandshake(CLIENT_HELLO, payload)
 	}
 
+	def genServerHelloHandshake(payload: Array[Byte]): Array[Byte] = {
+		genHandshake(SERVER_HELLO, payload)
+	}
+
 	def genClientKeyExchange(payload: Array[Byte]): Array[Byte] = {
 		genHandshake(CLIENT_KEY_EXCHANGE, payload)
 	}

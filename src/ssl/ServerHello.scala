@@ -4,7 +4,10 @@ import util.Util._
 import ssl.SSLConstants._
 import util._
 
-class ServerHello(conn: SSLClientConnection) {
+class ServerHello(conn: SSLConnection) {
+	/////////////////////////
+	// Server Hello Recv Part
+	/////////////////////////
 	def decode(data: Array[Byte]) {
 		val reader = new ArrayBasedReader(data)
 		val maj = reader.nextInt(1)
@@ -33,5 +36,32 @@ class ServerHello(conn: SSLClientConnection) {
 			printf("+++++++ Server Hello has more information: \n")
 			dumpByteArray(reader.getData)
 		}
+	}
+
+	/////////////////////////
+	// Server Hello Send Part
+	/////////////////////////
+	val serverRandom: Array[Byte] = {
+		val random = genRandom(32)
+		conn.serverRandom = random
+		random
+	}
+
+	val serverSessionPart: Array[Byte] = {
+		val random = genRandom(32)
+		Array[Byte](32.asInstanceOf[Byte]) ++ random
+	}
+
+	val cipherSuite: Array[Byte] = {
+		intToByteArray(SSL_RSA_WITH_RC4_128_MD5, 2)
+	}
+
+	val compressionMethod: Array[Byte] = {
+		intToByteArray(0, 1)
+	}
+
+	def serialize: Array[Byte] = {
+		val payload = Array[Byte](MAJVER, MINVER) ++ serverRandom ++ serverSessionPart ++ cipherSuite ++ compressionMethod
+		Handshake.genServerHelloHandshake(payload)
 	}
 }
