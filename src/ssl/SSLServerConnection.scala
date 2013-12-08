@@ -50,4 +50,9 @@ class SSLServerConnection(sock: Socket, certPath: String, keyPath: String) exten
 
 		dump4keys
 	}
+
+	def recvClientChangeCipherSpec = {
+		recvChangeCipherSpec
+		printf("GET Client change cipher spec\n")
+	}
 }

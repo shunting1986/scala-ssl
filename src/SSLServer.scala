@@ -20,6 +20,7 @@ object SSLServer {
 		conn.sendServerHelloDone
 
 		conn.recvClientKeyExchange
+		conn.recvClientChangeCipherSpec
 
 		spin
 	}

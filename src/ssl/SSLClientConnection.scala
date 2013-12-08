@@ -18,7 +18,6 @@ class SSLClientConnection(sock: Socket) extends SSLConnection(sock) {
 	// flags
 	var serverCertReceived = false
 	var serverHelloDoneReceived = false
-	var needDecrypt = false
 
 	def decryptVerifyServerData(contentType: Int, origData: Array[Byte]): Array[Byte] = {
 		var data = this.decryptServerData(origData)
@@ -49,13 +48,8 @@ class SSLClientConnection(sock: Socket) extends SSLConnection(sock) {
 	}
 
 	def recvServerChangeCipherSpec = {
-		val header = recv(5)
-		val len = SSLRecord.validateHeader(header, CT_CHANGE_CIPHER_SPEC)
-		val data = recv(len)
-		assert(len == 1)
-		assert(data(0) == 1.asInstanceOf[Byte])
-		printf("GET Server change cipher spec\n");
-		this.needDecrypt = true
+		recvChangeCipherSpec
+		printf("GET Server change cipher spec\n")
 	}
 
 	/*

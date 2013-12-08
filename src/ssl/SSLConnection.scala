@@ -4,6 +4,7 @@ import java.net.Socket
 import util._
 import crypto._
 import util.Util._
+import ssl.SSLRecord._
 
 class SSLConnection(sock: Socket) {
 	// IO
@@ -31,6 +32,9 @@ class SSLConnection(sock: Socket) {
 	var serverWriteRC4: RC4 = null
 
 	var masterSecret: Array[Byte] = null
+
+	// flags
+	var needDecrypt = false
 
 	val sbArray = new StreamBasedArray(is)
 	def recv(len: Int): Array[Byte] = {
@@ -72,4 +76,15 @@ class SSLConnection(sock: Socket) {
 		printf("Client Write Key: "); dumpByteArray(clientWriteKey)
 		printf("Server Write Key: "); dumpByteArray(serverWriteKey)
 	}
+
+	def recvChangeCipherSpec = {
+		val header = recv(5)
+		val len = SSLRecord.validateHeader(header, CT_CHANGE_CIPHER_SPEC)
+		val data = recv(len)
+		assert(len == 1)
+		assert(data(0) == 1.asInstanceOf[Byte])
+		this.needDecrypt = true
+	}
+
+
 }
