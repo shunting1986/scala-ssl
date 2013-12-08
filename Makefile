@@ -9,5 +9,5 @@ client:
 	@$(SCALA) -classpath classes SSLClient
 
 server:
-	@$(SCALA) -classpath classes SSLServer
+	@$(SCALA) -classpath classes SSLServer /home/shunting/work/ubuntu-contents/learn-lang/proj/ssl/certs/server.crt
 

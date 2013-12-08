@@ -48,12 +48,16 @@ class X509Certificate {
 		publicKey = new PublicKey; publicKey.parseDerNode(certSeq.getChild(6))
 	}
 
-	def parsePemFile(certPath: String) {
+	def pemFileToDer(certPath: String): Array[Byte] = {
 		val fcont = Source.fromFile(certPath).getLines.mkString("\n")
-		parsePemStr(fcont)
+		pemStrToDer(fcont)
 	}
 
-	def parsePemStr(pemstr: String) {
+	def parsePemFile(certPath: String) {
+		parseDer(pemFileToDer(certPath))
+	}
+
+	def pemStrToDer(pemstr: String): Array[Byte] = {
 		val ind_prefix = pemstr.indexOf(prefix_mark)
 		val ind_postfix = pemstr.indexOf(postfix_mark)
 
@@ -61,7 +65,11 @@ class X509Certificate {
 		assert(ind_postfix >= 0)
 		val body = pemstr.substring(ind_prefix + prefix_mark.length, ind_postfix)
 		val der = Base64.decode(body)
+		der
+	}
 
+	def parsePemStr(pemstr: String) {
+		val der = pemStrToDer(pemstr)
 		parseDer(der)
 	}
 

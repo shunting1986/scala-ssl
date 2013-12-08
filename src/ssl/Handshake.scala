@@ -26,6 +26,10 @@ object Handshake {
 		genHandshake(SERVER_HELLO, payload)
 	}
 
+	def genCertificate(payload: Array[Byte]): Array[Byte] = {
+		genHandshake(CERTIFICATE, payload)
+	}
+
 	def genClientKeyExchange(payload: Array[Byte]): Array[Byte] = {
 		genHandshake(CLIENT_KEY_EXCHANGE, payload)
 	}
