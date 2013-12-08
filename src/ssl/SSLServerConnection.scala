@@ -28,4 +28,12 @@ class SSLServerConnection(sock: Socket, certPath: String) extends SSLConnection(
 		recordHandshake(hkdata)
 		send(SSLRecord.createHandshake(hkdata).serialize)
 	}
+
+	def sendServerHelloDone {
+		val payload = Array[Byte]() // empty
+		val hkData = Handshake.genServerHelloDone(payload)
+
+		recordHandshake(hkData)
+		send(SSLRecord.createHandshake(hkData).serialize)
+	}
 }

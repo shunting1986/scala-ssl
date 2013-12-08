@@ -16,6 +16,7 @@ object SSLServer {
 		conn.recvClientHello // one handshake record
 		conn.sendServerHello
 		conn.sendServerCertificate
+		conn.sendServerHelloDone
 
 		spin
 	}
