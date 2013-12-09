@@ -88,4 +88,8 @@ class SSLServerConnection(sock: Socket, certPath: String, keyPath: String) exten
 		val hkData = (new FinishedHS(this, SERVER_TO_CLIENT)).serialize
 		send(SSLRecord.createHandshake(hkData).serialize)
 	}
+
+	def recvAppData: Array[Byte] = {
+		recvAppData(CLIENT)
+	}
 }

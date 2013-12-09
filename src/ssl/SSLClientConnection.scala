@@ -79,13 +79,8 @@ class SSLClientConnection(sock: Socket) extends SSLConnection(sock) {
 		sendClientRecord(SSLRecord.CT_ALERT, data)
 	}
 
-	def recvAppData {
-		val header = recv(5)
-		val len = SSLRecord.validateHeader(header, CT_APPLICATION_DATA)
-		var data = recv(len)
-
-		data = decryptVerifyServerData(CT_APPLICATION_DATA, data)
-		printf(new String(data))
+	def recvAppData: Array[Byte] = {
+		recvAppData(SERVER)
 	}
 
 	def recvServerAlert {

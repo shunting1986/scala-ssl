@@ -103,6 +103,18 @@ abstract class SSLConnection(sock: Socket) {
 		data
 	}
 
+	/*
+	 * entityType indicate the data is from server or client
+	 */
+	def recvAppData(entityType: Int): Array[Byte] = {
+		val header = recv(5)
+		val len = SSLRecord.validateHeader(header, CT_APPLICATION_DATA)
+		var data = recv(len)
+
+		data = decryptVerifyData(entityType, CT_APPLICATION_DATA, data)
+		data
+	}
+
 	def sendChangeCipherSpec {
 		// sample 14 03 00 00 01 01 
 		val record = SSLRecord.createChangeCipherSpec(Array[Byte](1))

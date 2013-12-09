@@ -28,7 +28,8 @@ object SSLClient {
 
 		conn.sendAppData("GET /hi HTTP/1.0\n\n".getBytes)
 		printf("============= BEGIN DATA ===============\n")
-		conn.recvAppData
+		val data = conn.recvAppData
+		printf(new String(data))
 		printf("============= END   DATA ===============\n")
 
 		conn.recvServerAlert

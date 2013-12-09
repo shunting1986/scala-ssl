@@ -177,6 +177,10 @@ object Util {
 		}
 	}
 
+	def isSpace(ch: Char): Boolean = {
+		ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n'
+	}
+
 	def main(args: Array[String]) {
 		val input = streamToByteArray(System.in)
 		val output = hexToBin(input)
