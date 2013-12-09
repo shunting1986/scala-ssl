@@ -5,8 +5,10 @@ import java.net.Socket
 
 object SSLClient {
 	def main(args: Array[String]) {
-		val host = "127.0.0.1"
-		val port = 8443
+		assert(args.length == 2)
+		val host = args(0)
+		val port = Integer.parseInt(args(1))
+
 		val sock = new Socket(host, port)
 		val conn = new SSLClientConnection(sock)
 
