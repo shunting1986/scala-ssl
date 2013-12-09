@@ -42,7 +42,9 @@ object SSLServer {
 		val httpResp = new HTTPResponse("You want to " + httpReq.method + " " + httpReq.uri + "\n")
 		val respStr = httpResp.serialize
 		conn.sendAppData(respStr.getBytes)
-		
+
+		conn.sendServerAlert
+		conn.close
 		spin
 	}
 }

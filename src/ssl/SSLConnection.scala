@@ -122,6 +122,8 @@ abstract class SSLConnection(sock: Socket) {
 		send(record.serialize)
 	}
 
+	def sendRecord(contentType: Int, plainText: Array[Byte]) 
+
 	def sendRecord(dir: Int, contentType: Int, plainText: Array[Byte]) {
 		var rc4 = this.clientWriteRC4 
 		var entity = CLIENT
@@ -134,5 +136,10 @@ abstract class SSLConnection(sock: Socket) {
 		var hmac = hmacAgt.genHMAC(entity, contentType.asInstanceOf[Byte], plainText)
 		val cipherText = rc4.encrypt(plainText ++ hmac)
 		send((new SSLRecord(contentType, cipherText)).serialize)
+	}
+
+	def sendAlert = {
+		val data = Array[Byte](Alert.LEVEL_WARNING.asInstanceOf[Byte], Alert.DESC_CLOSE_NOTIFY.asInstanceOf[Byte])
+		sendRecord(SSLRecord.CT_ALERT, data)
 	}
 }

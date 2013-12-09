@@ -62,17 +62,16 @@ class SSLClientConnection(sock: Socket) extends SSLConnection(sock) {
 		finishRecording = true
 	}
 
-	def sendClientRecord(contentType: Int, plainText: Array[Byte]) {
+	override def sendRecord(contentType: Int, plainText: Array[Byte]) {
 		sendRecord(CLIENT_TO_SERVER, contentType, plainText)
 	}
 
 	def sendAppData(plainText: Array[Byte]) {
-		sendClientRecord(SSLRecord.CT_APPLICATION_DATA, plainText)
+		sendRecord(SSLRecord.CT_APPLICATION_DATA, plainText)
 	}
 
 	def sendClientAlert {
-		val data = Array[Byte](Alert.LEVEL_WARNING.asInstanceOf[Byte], Alert.DESC_CLOSE_NOTIFY.asInstanceOf[Byte])
-		sendClientRecord(SSLRecord.CT_ALERT, data)
+		sendAlert
 	}
 
 	def recvAppData: Array[Byte] = {
