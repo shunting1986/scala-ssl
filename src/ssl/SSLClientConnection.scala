@@ -53,10 +53,7 @@ class SSLClientConnection(sock: Socket) extends SSLConnection(sock) {
 	}
 
 	def sendClientChangeCipherSpec {
-		// sample 14 03 00 00 01 01 
-		// doRecording = false // do not record the ChangeCipherSpec sent by client which is not a handshake
-		val record = SSLRecord.createChangeCipherSpec(Array[Byte](1))
-		send(record.serialize)
+		sendChangeCipherSpec
 	}
 
 	def sendClientFinishedHandshake {

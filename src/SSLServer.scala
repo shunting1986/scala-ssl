@@ -23,6 +23,8 @@ object SSLServer {
 		conn.recvClientChangeCipherSpec
 		conn.recvClientFinishedHandshake
 
+		conn.sendServerChangeCipherSpec
+
 		spin
 	}
 }

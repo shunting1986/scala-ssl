@@ -79,4 +79,8 @@ class SSLServerConnection(sock: Socket, certPath: String, keyPath: String) exten
 		recordHandshake(data) // must put this later!!
 		finishRecording = true
 	}
+
+	def sendServerChangeCipherSpec {
+		sendChangeCipherSpec
+	}
 }

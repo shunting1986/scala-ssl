@@ -103,5 +103,9 @@ abstract class SSLConnection(sock: Socket) {
 		data
 	}
 
-
+	def sendChangeCipherSpec {
+		// sample 14 03 00 00 01 01 
+		val record = SSLRecord.createChangeCipherSpec(Array[Byte](1))
+		send(record.serialize)
+	}
 }
