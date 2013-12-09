@@ -63,11 +63,7 @@ class SSLClientConnection(sock: Socket) extends SSLConnection(sock) {
 	}
 
 	def sendClientRecord(contentType: Int, plainText: Array[Byte]) {
-		val rc4 = this.clientWriteRC4 
-		val hmacAgt = new RecordHMAC(this)
-		var hmac = hmacAgt.genClientHMAC(contentType.asInstanceOf[Byte], plainText)
-		val cipherText = rc4.encrypt(plainText ++ hmac)
-		send((new SSLRecord(contentType, cipherText)).serialize)
+		sendRecord(CLIENT_TO_SERVER, contentType, plainText)
 	}
 
 	def sendAppData(plainText: Array[Byte]) {

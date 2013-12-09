@@ -5,6 +5,7 @@ import util._
 import crypto._
 import util.Util._
 import ssl.SSLRecord._
+import ssl.SSLConstants._
 
 abstract class SSLConnection(sock: Socket) {
 	// IO
@@ -119,5 +120,19 @@ abstract class SSLConnection(sock: Socket) {
 		// sample 14 03 00 00 01 01 
 		val record = SSLRecord.createChangeCipherSpec(Array[Byte](1))
 		send(record.serialize)
+	}
+
+	def sendRecord(dir: Int, contentType: Int, plainText: Array[Byte]) {
+		var rc4 = this.clientWriteRC4 
+		var entity = CLIENT
+		if (dir == SERVER_TO_CLIENT) {
+			rc4 = this.serverWriteRC4
+			entity = SERVER
+		}
+
+		val hmacAgt = new RecordHMAC(this)
+		var hmac = hmacAgt.genHMAC(entity, contentType.asInstanceOf[Byte], plainText)
+		val cipherText = rc4.encrypt(plainText ++ hmac)
+		send((new SSLRecord(contentType, cipherText)).serialize)
 	}
 }

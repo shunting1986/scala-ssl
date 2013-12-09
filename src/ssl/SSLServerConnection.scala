@@ -92,4 +92,12 @@ class SSLServerConnection(sock: Socket, certPath: String, keyPath: String) exten
 	def recvAppData: Array[Byte] = {
 		recvAppData(CLIENT)
 	}
+
+	def sendServerRecord(contentType: Int, plainText: Array[Byte]) {
+		sendRecord(SERVER_TO_CLIENT, contentType, plainText)
+	}
+
+	def sendAppData(plainText: Array[Byte]) {
+		sendServerRecord(SSLRecord.CT_APPLICATION_DATA, plainText)
+	}
 }

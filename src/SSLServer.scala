@@ -37,13 +37,11 @@ object SSLServer {
 		printf("============ END   Request ===========\n")
 
 		val httpReq = new HTTPRequest(requestStr)
-		val respStr = "You want to " + httpReq.method + " " + httpReq.uri + "\n"
-		printf(respStr)
 
-		/*
-		val httpResp = new HTTResponse("You want to " + httpReq.method + " " + httpReq.uri + "\n")
-		conn.sendAppData(httpResp.getBytes)
-		 */
+		// generate http response
+		val httpResp = new HTTPResponse("You want to " + httpReq.method + " " + httpReq.uri + "\n")
+		val respStr = httpResp.serialize
+		conn.sendAppData(respStr.getBytes)
 		
 		spin
 	}
