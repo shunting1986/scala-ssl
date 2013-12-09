@@ -24,6 +24,7 @@ object SSLServer {
 		conn.recvClientFinishedHandshake
 
 		conn.sendServerChangeCipherSpec
+		conn.sendServerFinishedHandshake
 
 		spin
 	}

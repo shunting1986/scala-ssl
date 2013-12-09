@@ -69,18 +69,23 @@ class SSLServerConnection(sock: Socket, certPath: String, keyPath: String) exten
 	def recvClientFinishedHandshake = {
 		var data = recvRecord(SSLRecord.CT_HANDSHAKE)
 		// decrypt
-		data = decryptVerifyClientData(CT_HANDSHAKE, data)
+		val hkdata = decryptVerifyClientData(CT_HANDSHAKE, data)
 
-		data = Handshake.parseFinished(data)
+		data = Handshake.parseFinished(hkdata)
 		val finishedAgt = new FinishedHS(this, CLIENT_TO_SERVER)
 		finishedAgt.verifyClientFinishMsg(data)
 		printf("Pass validation for client finished message\n")
 
-		recordHandshake(data) // must put this later!!
+		recordHandshake(hkdata) // must put this later!!
 		finishRecording = true
 	}
 
 	def sendServerChangeCipherSpec {
 		sendChangeCipherSpec
+	}
+
+	def sendServerFinishedHandshake {
+		val hkData = (new FinishedHS(this, SERVER_TO_CLIENT)).serialize
+		send(SSLRecord.createHandshake(hkData).serialize)
 	}
 }
