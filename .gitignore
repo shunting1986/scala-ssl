@@ -1,3 +1,7 @@
 .*.swp
 classes
 temp
+
+sr
+.ctags
+tags
